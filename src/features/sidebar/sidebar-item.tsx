@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { TreeNode, NodeType } from "@/types";
+import { NodeType } from "@/types";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import {
-  ChevronRight,
-  ChevronDown,
-  Folder,
-  FileJson,
-  MoreHorizontal,
-  FolderPlus,
-  FilePlus,
-  Trash2,
-  Edit2,
-  Box,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  FolderIcon,
+  FileJsonIcon,
+  MoreHorizontalIcon,
+  FolderPlusIcon,
+  FilePlusIcon,
+  Trash2Icon,
+  Edit2Icon,
+  BoxIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -53,7 +53,6 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
 
   const isExpanded = node.isExpanded;
   const isActive = activeRequestId === nodeId;
-  const hasChildren = node.children && node.children.length > 0;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -88,10 +87,10 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
 
   const Icon =
     node.type === "workspace"
-      ? Box
+      ? BoxIcon
       : node.type === "collection"
-      ? Folder
-      : FileJson;
+      ? FolderIcon
+      : FileJsonIcon;
 
   return (
     <div>
@@ -108,9 +107,9 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
             <div className="w-4 h-4 flex items-center justify-center shrink-0 text-muted-foreground">
               {node.type !== "request" &&
                 (isExpanded ? (
-                  <ChevronDown size={14} />
+                  <ChevronDownIcon size={14} />
                 ) : (
-                  <ChevronRight size={14} />
+                  <ChevronRightIcon size={14} />
                 ))}
             </div>
 
@@ -143,7 +142,7 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="p-1 hover:bg-background rounded-sm">
-                    <MoreHorizontal size={14} />
+                    <MoreHorizontalIcon size={14} />
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48">
@@ -152,25 +151,25 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
                       <DropdownMenuItem
                         onClick={() => handleCreate("collection")}
                       >
-                        <FolderPlus className="mr-2 h-4 w-4" />
+                        <FolderPlusIcon className="mr-2 h-4 w-4" />
                         New Folder
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleCreate("request")}>
-                        <FilePlus className="mr-2 h-4 w-4" />
+                        <FilePlusIcon className="mr-2 h-4 w-4" />
                         New Request
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
                   )}
                   <DropdownMenuItem onClick={handleRename}>
-                    <Edit2 className="mr-2 h-4 w-4" />
+                    <Edit2Icon className="mr-2 h-4 w-4" />
                     Rename
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => deleteNode(nodeId)}
                     className="text-red-600 focus:text-red-600"
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2Icon className="mr-2 h-4 w-4" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -182,25 +181,25 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
           {node.type !== "request" && (
             <>
               <ContextMenuItem onClick={() => handleCreate("collection")}>
-                <FolderPlus className="mr-2 h-4 w-4" />
+                <FolderPlusIcon className="mr-2 h-4 w-4" />
                 New Folder
               </ContextMenuItem>
               <ContextMenuItem onClick={() => handleCreate("request")}>
-                <FilePlus className="mr-2 h-4 w-4" />
+                <FilePlusIcon className="mr-2 h-4 w-4" />
                 New Request
               </ContextMenuItem>
               <ContextMenuSeparator />
             </>
           )}
           <ContextMenuItem onClick={handleRename}>
-            <Edit2 className="mr-2 h-4 w-4" />
+            <Edit2Icon className="mr-2 h-4 w-4" />
             Rename
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => deleteNode(nodeId)}
             className="text-red-600 focus:text-red-600"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2Icon className="mr-2 h-4 w-4" />
             Delete
           </ContextMenuItem>
         </ContextMenuContent>

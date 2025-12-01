@@ -9,7 +9,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useWorkspaceStore } from "@/stores/workspace-store";
-import { FileJson, Folder, Box, Settings } from "lucide-react";
+import { FileJsonIcon, FolderIcon, BoxIcon, SettingsIcon } from "lucide-react";
 import { TreeNode } from "@/types";
 
 interface CommandPaletteProps {
@@ -69,7 +69,7 @@ export function CommandPalette({
         <CommandGroup heading="Requests">
           {requests.map((node) => (
             <CommandItem key={node.id} onSelect={() => handleSelect(node)}>
-              <FileJson className="mr-2 h-4 w-4" />
+              <FileJsonIcon className="mr-2 h-4 w-4" />
               <span>{node.name}</span>
             </CommandItem>
           ))}
@@ -80,7 +80,7 @@ export function CommandPalette({
         <CommandGroup heading="Folders">
           {collections.map((node) => (
             <CommandItem key={node.id} onSelect={() => handleSelect(node)}>
-              <Folder className="mr-2 h-4 w-4" />
+              <FolderIcon className="mr-2 h-4 w-4" />
               <span>{node.name}</span>
             </CommandItem>
           ))}
@@ -91,7 +91,7 @@ export function CommandPalette({
         <CommandGroup heading="Workspaces">
           {workspaces.map((node) => (
             <CommandItem key={node.id} onSelect={() => handleSelect(node)}>
-              <Box className="mr-2 h-4 w-4" />
+              <BoxIcon className="mr-2 h-4 w-4" />
               <span>{node.name}</span>
             </CommandItem>
           ))}
@@ -106,7 +106,7 @@ export function CommandPalette({
               onOpenChange(false);
             }}
           >
-            <Settings className="mr-2 h-4 w-4" />
+            <SettingsIcon className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </CommandItem>
         </CommandGroup>

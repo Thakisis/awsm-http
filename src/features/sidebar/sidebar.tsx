@@ -1,7 +1,7 @@
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { SidebarItem } from "./sidebar-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, FolderPlus, FilePlus, Box } from "lucide-react";
+import { PlusIcon, FolderPlusIcon, FilePlusIcon, BoxIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -41,20 +41,20 @@ export function Sidebar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-5 w-5">
-              <Plus size={14} />
+              <PlusIcon size={14} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleCreateRoot("workspace")}>
-              <Box className="mr-2 h-4 w-4" />
+              <BoxIcon className="mr-2 h-4 w-4" />
               New Workspace
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleCreateRoot("collection")}>
-              <FolderPlus className="mr-2 h-4 w-4" />
+              <FolderPlusIcon className="mr-2 h-4 w-4" />
               New Folder
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleCreateRoot("request")}>
-              <FilePlus className="mr-2 h-4 w-4" />
+              <FilePlusIcon className="mr-2 h-4 w-4" />
               New Request
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -73,15 +73,15 @@ export function Sidebar() {
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={() => handleCreateRoot("workspace")}>
-            <Box className="mr-2 h-4 w-4" />
+            <BoxIcon className="mr-2 h-4 w-4" />
             New Workspace
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleCreateRoot("collection")}>
-            <FolderPlus className="mr-2 h-4 w-4" />
+            <FolderPlusIcon className="mr-2 h-4 w-4" />
             New Folder
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleCreateRoot("request")}>
-            <FilePlus className="mr-2 h-4 w-4" />
+            <FilePlusIcon className="mr-2 h-4 w-4" />
             New Request
           </ContextMenuItem>
         </ContextMenuContent>

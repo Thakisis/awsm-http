@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme-provider";
-import { Moon, Sun, Laptop } from "lucide-react";
+import { MoonIcon, SunIcon, LaptopIcon } from "lucide-react";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -50,7 +50,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     onClick={() => setTheme("light")}
                   >
                     <div className="h-20 w-32 rounded-md bg-[#f0f0f0] border shadow-sm flex items-center justify-center">
-                      <Sun className="text-orange-500" />
+                      <SunIcon className="text-orange-500" />
                     </div>
                     <span className="text-xs font-medium">Light</span>
                   </div>
@@ -64,7 +64,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     onClick={() => setTheme("dark")}
                   >
                     <div className="h-20 w-32 rounded-md bg-[#1e1e1e] border shadow-sm flex items-center justify-center">
-                      <Moon className="text-blue-400" />
+                      <MoonIcon className="text-blue-400" />
                     </div>
                     <span className="text-xs font-medium">Dark</span>
                   </div>
@@ -78,7 +78,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     onClick={() => setTheme("system")}
                   >
                     <div className="h-20 w-32 rounded-md bg-linear-to-r from-[#f0f0f0] to-[#1e1e1e] border shadow-sm flex items-center justify-center">
-                      <Laptop className="text-muted-foreground mix-blend-difference" />
+                      <LaptopIcon className="text-muted-foreground mix-blend-difference" />
                     </div>
                     <span className="text-xs font-medium">System</span>
                   </div>

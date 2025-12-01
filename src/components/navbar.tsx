@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { FolderOpen, Settings, Box, Search } from "lucide-react";
+import { SettingsIcon, BoxIcon, SearchIcon } from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import {
   Breadcrumb,
@@ -45,7 +45,7 @@ export function Navbar() {
         <div className="flex h-14 items-center px-4 gap-4">
           <div className="flex items-center gap-2 font-bold text-lg">
             <div className="bg-primary text-primary-foreground p-1 rounded-md">
-              <Box size={20} />
+              <BoxIcon size={20} />
             </div>
             <span>awsm-http</span>
           </div>
@@ -85,7 +85,7 @@ export function Navbar() {
                 className="lg:w-96 justify-start text-muted-foreground text-sm font-normal"
                 onClick={() => setOpenCommand(true)}
               >
-                <Search size={14} className="mr-2" />
+                <SearchIcon size={14} className="mr-2" />
                 Search...
                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 ml-auto">
                   <span className="text-xs">⌘</span>K
@@ -98,7 +98,7 @@ export function Navbar() {
                 size="icon"
                 onClick={() => setOpenSettings(true)}
               >
-                <Settings size={18} />
+                <SettingsIcon size={18} />
               </Button>
             </div>
           </div>

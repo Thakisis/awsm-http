@@ -11,7 +11,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Play, Plus, Trash2, Rocket, Eye, EyeOff } from "lucide-react";
+import {
+  PlayIcon,
+  PlusIcon,
+  Trash2Icon,
+  RocketIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "lucide-react";
 
 import { ResponseViewer } from "./response-viewer";
 import { HttpMethod, RequestAuth } from "@/types";
@@ -73,7 +80,7 @@ function KeyValueTable({
           onClick={onAdd}
           className="h-6 text-xs"
         >
-          <Plus size={12} className="mr-1" /> Add
+          <PlusIcon size={12} className="mr-1" /> Add
         </Button>
       </div>
       <div className="space-y-1">
@@ -104,7 +111,7 @@ function KeyValueTable({
               className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={() => onRemove(item.id)}
             >
-              <Trash2
+              <Trash2Icon
                 size={14}
                 className="text-muted-foreground hover:text-red-500"
               />
@@ -191,7 +198,11 @@ function AuthEditor({
                 className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                {showPassword ? (
+                  <EyeOffIcon size={14} />
+                ) : (
+                  <EyeIcon size={14} />
+                )}
               </Button>
             </div>
           </div>
@@ -301,7 +312,7 @@ export function RequestEditor() {
       <div className="h-full flex items-center justify-center text-muted-foreground">
         <Empty>
           <EmptyMedia>
-            <Rocket className="text-muted-foreground" />
+            <RocketIcon className="text-muted-foreground" />
           </EmptyMedia>
           <EmptyHeader>
             <EmptyTitle>No Request Selected</EmptyTitle>
@@ -491,7 +502,7 @@ export function RequestEditor() {
             "Sending..."
           ) : (
             <>
-              <Play size={16} className="mr-2" /> Send
+              <PlayIcon size={16} className="mr-2" /> Send
             </>
           )}
         </Button>
@@ -735,7 +746,7 @@ export function RequestEditor() {
                 <div className="h-full flex items-center justify-center p-8">
                   <Empty>
                     <EmptyMedia>
-                      <Rocket className="text-muted-foreground" />
+                      <RocketIcon className="text-muted-foreground" />
                     </EmptyMedia>
                     <EmptyHeader>
                       <EmptyTitle>No Response Yet</EmptyTitle>
