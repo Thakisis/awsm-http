@@ -1,8 +1,8 @@
 [package]
 name = "awsm-http"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "0.0.2"
+description = "Another awesome http client built with Tauri"
+authors = ["Hyuuh"]
 license = "MIT"
 edition = "2021"
 
