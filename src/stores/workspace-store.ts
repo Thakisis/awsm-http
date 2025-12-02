@@ -18,6 +18,10 @@ interface WorkspaceActions {
   setActiveRequest: (id: string | null) => void;
   setResponse: (requestId: string, response: ResponseData) => void;
   initializeMockData: () => void;
+  importWorkspace: (data: {
+    nodes: Record<string, TreeNode>;
+    rootIds: string[];
+  }) => void;
 }
 
 const DEFAULT_REQUEST_DATA: RequestData = {
@@ -194,6 +198,15 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             [requestId]: response,
           },
         }));
+      },
+
+      importWorkspace: (data) => {
+        set({
+          nodes: data.nodes,
+          rootIds: data.rootIds,
+          activeRequestId: null,
+          responses: {},
+        });
       },
 
       initializeMockData: () => {

@@ -40,7 +40,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Theme</Label>
-                <div className="flex gap-4">
+                <div className="grid 2xl:grid-cols-3 gap-4 grid-cols-2">
                   <div
                     className={`flex flex-col items-center gap-2 cursor-pointer p-2 rounded-md border-2 ${
                       theme === "light"
