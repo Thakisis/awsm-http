@@ -5,7 +5,7 @@ import { WebSocketMessage } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn, substituteVariables } from "@/lib/utils";
 import { SendIcon, PlugIcon, PlugZapIcon, Trash2Icon } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -25,12 +25,32 @@ export function WebSocketEditor({ requestId }: WebSocketEditorProps) {
   const updateWebSocketData = useWorkspaceStore(
     (state) => state.updateWebSocketData
   );
+  const environments = useWorkspaceStore((state) => state.environments);
+  const globalVariables = useWorkspaceStore(
+    (state) => state.globalVariables || []
+  );
+  const activeEnvironmentId = useWorkspaceStore(
+    (state) => state.activeEnvironmentId
+  );
+  const fakerLocale = useWorkspaceStore((state) => state.fakerLocale);
 
   const [isConnected, setIsConnected] = useState(false);
   const [messageInput, setMessageInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const messages = node?.wsData?.messages || [];
+
+  // Prepare variables
+  const activeEnv = environments.find((e) => e.id === activeEnvironmentId);
+  const variables: Record<string, string> = {};
+  globalVariables.forEach((v) => {
+    if (v.enabled) variables[v.key] = v.value;
+  });
+  if (activeEnv) {
+    activeEnv.variables.forEach((v) => {
+      if (v.enabled) variables[v.key] = v.value;
+    });
+  }
 
   const addMessage = (msg: WebSocketMessage) => {
     const currentMessages =
@@ -56,9 +76,10 @@ export function WebSocketEditor({ requestId }: WebSocketEditorProps) {
       // Status update will come from callback
     } else {
       if (!node.wsData?.url) return;
+      const url = substituteVariables(node.wsData.url, variables, fakerLocale);
       WebSocketClient.connect(
         requestId,
-        node.wsData.url,
+        url,
         node.wsData.type || "raw",
         (msg) => addMessage(msg),
         (status) => setIsConnected(status)
@@ -69,7 +90,8 @@ export function WebSocketEditor({ requestId }: WebSocketEditorProps) {
   const handleSend = () => {
     if (!messageInput) return;
     try {
-      WebSocketClient.send(requestId, messageInput);
+      const message = substituteVariables(messageInput, variables, fakerLocale);
+      WebSocketClient.send(requestId, message);
       setMessageInput("");
     } catch (e) {
       // Error handled in client or ignored

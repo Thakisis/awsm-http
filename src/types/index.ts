@@ -147,5 +147,6 @@ export interface WorkspaceState {
   responses: Record<string, ResponseData | null>;
   environments: Environment[];
   activeEnvironmentId: string | null;
+  globalVariables: EnvironmentVariable[];
   history: HistoryItem[];
 }

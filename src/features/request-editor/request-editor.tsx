@@ -149,8 +149,19 @@ ${fakerTypeProps}
         const activeEnv = state.environments.find(
           (e) => e.id === state.activeEnvironmentId
         );
+        const globalVariables = state.globalVariables || [];
 
         const suggestions: any[] = [];
+
+        // Add global variables
+        suggestions.push(
+          ...globalVariables.map((v) => ({
+            label: v.key,
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: v.key + "}}",
+            detail: `Global: ${v.value}`,
+          }))
+        );
 
         if (activeEnv) {
           suggestions.push(
@@ -158,7 +169,7 @@ ${fakerTypeProps}
               label: v.key,
               kind: monaco.languages.CompletionItemKind.Variable,
               insertText: v.key + "}}",
-              detail: v.value,
+              detail: `Env: ${v.value}`,
             }))
           );
         }
@@ -739,6 +750,9 @@ export function RequestEditor() {
   );
 
   const environments = useWorkspaceStore((state) => state.environments);
+  const globalVariables = useWorkspaceStore(
+    (state) => state.globalVariables || []
+  );
   const activeEnvironmentId = useWorkspaceStore(
     (state) => state.activeEnvironmentId
   );
@@ -749,6 +763,15 @@ export function RequestEditor() {
   // Prepare variables for substitution
   const activeEnv = environments.find((e) => e.id === activeEnvironmentId);
   const variables: Record<string, string> = {};
+
+  // 1. Add global variables
+  globalVariables.forEach((v) => {
+    if (v.enabled) {
+      variables[v.key] = v.value;
+    }
+  });
+
+  // 2. Override with active environment variables
   if (activeEnv) {
     activeEnv.variables.forEach((v) => {
       if (v.enabled) {

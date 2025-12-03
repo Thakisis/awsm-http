@@ -1,7 +1,13 @@
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { SidebarItem } from "./sidebar-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PlusIcon, FolderPlusIcon, FilePlusIcon, PlugIcon } from "lucide-react";
+import {
+  PlusIcon,
+  FolderPlusIcon,
+  FilePlusIcon,
+  PlugIcon,
+  BoxIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -65,8 +71,30 @@ export function Sidebar() {
 
     if (!activeNode || !overNode) return;
 
+    // If dropping over a collection/folder or workspace, move INTO it
+    if (
+      (overNode.type === "collection" || overNode.type === "workspace") &&
+      activeId !== overId
+    ) {
+      // Prevent workspace from being moved into anything
+      if (activeNode.type === "workspace") {
+        // Fall through to sibling reordering (only allowed if target is root)
+      } else {
+        const newParentId = overId;
+        const newIndex = overNode.children ? overNode.children.length : 0;
+        moveNode(activeId, newParentId, newIndex);
+        return;
+      }
+    }
+
     // Moving relative to overNode (sibling)
     const newParentId = overNode.parentId;
+
+    // Constraint: Workspaces cannot be moved into a non-root parent
+    if (activeNode.type === "workspace" && newParentId) {
+      return;
+    }
+
     let newIndex = 0;
 
     if (newParentId) {
@@ -133,10 +161,13 @@ export function Sidebar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleCreateRoot("workspace")}>
+                  <BoxIcon /> New Workspace
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleCreateRoot("collection")}
                 >
-                  <FolderPlusIcon /> New Collection
+                  <FolderPlusIcon /> New Folder
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleCreateRoot("request")}>
                   <FilePlusIcon /> New Request
@@ -169,8 +200,11 @@ export function Sidebar() {
               </ScrollArea>
             </ContextMenuTrigger>
             <ContextMenuContent>
+              <ContextMenuItem onClick={() => handleCreateRoot("workspace")}>
+                <BoxIcon /> New Workspace
+              </ContextMenuItem>
               <ContextMenuItem onClick={() => handleCreateRoot("collection")}>
-                <FolderPlusIcon /> New Collection
+                <FolderPlusIcon /> New Folder
               </ContextMenuItem>
               <ContextMenuItem onClick={() => handleCreateRoot("request")}>
                 <FilePlusIcon /> New Request

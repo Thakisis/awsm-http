@@ -20,6 +20,7 @@ export interface WorkspaceState {
   responses: Record<string, ResponseData | null>;
   environments: Environment[];
   activeEnvironmentId: string | null;
+  globalVariables: EnvironmentVariable[];
   history: HistoryItem[];
   fakerLocale: string;
 }
@@ -52,6 +53,7 @@ interface WorkspaceActions {
     name: string,
     variables: EnvironmentVariable[]
   ) => void;
+  updateGlobalVariables: (variables: EnvironmentVariable[]) => void;
   deleteEnvironment: (id: string) => void;
   setActiveEnvironment: (id: string | null) => void;
 
@@ -116,6 +118,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
       responses: {},
       environments: [],
       activeEnvironmentId: null,
+      globalVariables: [],
       history: [],
       fakerLocale: "en",
 
@@ -464,6 +467,10 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             env.id === id ? { ...env, name, variables } : env
           ),
         }));
+      },
+
+      updateGlobalVariables: (variables) => {
+        set({ globalVariables: variables });
       },
 
       deleteEnvironment: (id) => {
