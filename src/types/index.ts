@@ -77,10 +77,25 @@ export interface TreeNode {
   data?: RequestData; // Only for type === 'request'
 }
 
+export interface EnvironmentVariable {
+  id: string;
+  key: string;
+  value: string;
+  enabled: boolean;
+}
+
+export interface Environment {
+  id: string;
+  name: string;
+  variables: EnvironmentVariable[];
+}
+
 export interface WorkspaceState {
   nodes: Record<string, TreeNode>;
   rootIds: string[];
   activeRequestId: string | null;
   openRequestIds: string[];
   responses: Record<string, ResponseData | null>;
+  environments: Environment[];
+  activeEnvironmentId: string | null;
 }

@@ -29,8 +29,42 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Editor, type Monaco } from "@monaco-editor/react";
 import { VesperTheme } from "./themes/vesper";
+import { VesperLightTheme } from "./themes/vesper-light";
+import { useTheme } from "@/components/theme-provider";
+
 const handleEditorDidMount = (monaco: Monaco) => {
   monaco.editor.defineTheme("Vesper", VesperTheme as any);
+  monaco.editor.defineTheme("VesperLight", VesperLightTheme as any);
+
+  // Register completion provider for JSON
+  monaco.languages.registerCompletionItemProvider("json", {
+    triggerCharacters: ["{"],
+    provideCompletionItems: (model, position) => {
+      const textUntilPosition = model.getValueInRange({
+        startLineNumber: position.lineNumber,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      });
+
+      if (textUntilPosition.endsWith("{{")) {
+        const state = useWorkspaceStore.getState();
+        const activeEnv = state.environments.find(
+          (e) => e.id === state.activeEnvironmentId
+        );
+        if (!activeEnv) return { suggestions: [] };
+
+        const suggestions = activeEnv.variables.map((v) => ({
+          label: v.key,
+          kind: monaco.languages.CompletionItemKind.Variable,
+          insertText: v.key + "}}",
+          detail: v.value,
+        }));
+        return { suggestions };
+      }
+      return { suggestions: [] };
+    },
+  });
 };
 
 import {
@@ -45,6 +79,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { substituteVariables } from "@/lib/utils";
+import { VariableInput } from "@/components/variable-input";
 
 // --- Helper Components ---
 
@@ -93,13 +129,13 @@ function KeyValueTable({
               className="mt-2.5"
             />
             <div className="flex-1 grid grid-cols-2 gap-2">
-              <Input
+              <VariableInput
                 placeholder={keyPlaceholder}
                 value={item.key}
                 onChange={(e) => onUpdate(item.id, "key", e.target.value)}
                 className="h-8 text-sm font-mono"
               />
-              <Input
+              <VariableInput
                 placeholder={valuePlaceholder}
                 value={item.value}
                 onChange={(e) => onUpdate(item.id, "value", e.target.value)}
@@ -286,6 +322,8 @@ function AuthEditor({
 export function RequestEditor() {
   const [is2XL, setIs2XL] = useState(false);
 
+  const { theme } = useTheme();
+
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1536px)");
     const onChange = () => setIs2XL(mql.matches);
@@ -304,6 +342,11 @@ export function RequestEditor() {
   const setResponse = useWorkspaceStore((state) => state.setResponse);
   const response = useWorkspaceStore((state) =>
     activeRequestId ? state.responses[activeRequestId] : null
+  );
+
+  const environments = useWorkspaceStore((state) => state.environments);
+  const activeEnvironmentId = useWorkspaceStore(
+    (state) => state.activeEnvironmentId
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -342,12 +385,91 @@ export function RequestEditor() {
   const handleSend = async () => {
     if (!node.data) return;
     setIsLoading(true);
+
+    // Prepare variables
+    const activeEnv = environments.find((e) => e.id === activeEnvironmentId);
+    const variables: Record<string, string> = {};
+    if (activeEnv) {
+      activeEnv.variables.forEach((v) => {
+        if (v.enabled) {
+          variables[v.key] = v.value;
+        }
+      });
+    }
+
     // Ensure we pass the full data structure including defaults if missing
-    const requestData = {
+    const rawRequestData = {
       ...node.data,
       auth: node.data.auth || { type: "none" },
       params: node.data.params || [],
     };
+
+    // Substitute variables
+    const requestData = {
+      ...rawRequestData,
+      url: substituteVariables(rawRequestData.url, variables),
+      headers: rawRequestData.headers.map((h) => ({
+        ...h,
+        key: substituteVariables(h.key, variables),
+        value: substituteVariables(h.value, variables),
+      })),
+      params: rawRequestData.params.map((p) => ({
+        ...p,
+        key: substituteVariables(p.key, variables),
+        value: substituteVariables(p.value, variables),
+      })),
+      body: {
+        ...rawRequestData.body,
+        content: substituteVariables(rawRequestData.body.content, variables),
+        formData: rawRequestData.body.formData?.map((f) => ({
+          ...f,
+          key: substituteVariables(f.key, variables),
+          value: substituteVariables(f.value, variables),
+        })),
+        formUrlEncoded: rawRequestData.body.formUrlEncoded?.map((f) => ({
+          ...f,
+          key: substituteVariables(f.key, variables),
+          value: substituteVariables(f.value, variables),
+        })),
+      },
+      auth: {
+        ...rawRequestData.auth,
+        basic: rawRequestData.auth.basic
+          ? {
+              username: substituteVariables(
+                rawRequestData.auth.basic.username || "",
+                variables
+              ),
+              password: substituteVariables(
+                rawRequestData.auth.basic.password || "",
+                variables
+              ),
+            }
+          : undefined,
+        bearer: rawRequestData.auth.bearer
+          ? {
+              token: substituteVariables(
+                rawRequestData.auth.bearer.token || "",
+                variables
+              ),
+            }
+          : undefined,
+        apikey: rawRequestData.auth.apikey
+          ? {
+              ...rawRequestData.auth.apikey,
+              key: substituteVariables(
+                rawRequestData.auth.apikey.key || "",
+                variables
+              ),
+              value: substituteVariables(
+                rawRequestData.auth.apikey.value || "",
+                variables
+              ),
+            }
+          : undefined,
+      },
+    };
+
     const res = await HttpClient.send(requestData);
     setResponse(activeRequestId, res);
     setIsLoading(false);
@@ -493,7 +615,7 @@ export function RequestEditor() {
           </SelectContent>
         </Select>
 
-        <Input
+        <VariableInput
           className="flex-1 font-mono text-sm"
           placeholder="Enter request URL"
           value={url}
@@ -654,7 +776,7 @@ export function RequestEditor() {
                           body: { ...body, content: val! },
                         })
                       }
-                      theme="Vesper"
+                      theme={theme === "dark" ? "Vesper" : "VesperLight"}
                       beforeMount={handleEditorDidMount}
                       options={{
                         fontSize: 14,
@@ -688,7 +810,7 @@ export function RequestEditor() {
                           body: { ...body, content: val || "" },
                         })
                       }
-                      theme="Vesper"
+                      theme={theme === "dark" ? "Vesper" : "VesperLight"}
                       beforeMount={handleEditorDidMount}
                       options={{
                         fontSize: 14,

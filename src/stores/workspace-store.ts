@@ -7,6 +7,8 @@ import {
   RequestData,
   ResponseData,
   WorkspaceState,
+  Environment,
+  EnvironmentVariable,
 } from "../types";
 
 interface WorkspaceActions {
@@ -20,10 +22,22 @@ interface WorkspaceActions {
   closeOtherTabs: (id: string) => void;
   closeAllTabs: () => void;
   setResponse: (requestId: string, response: ResponseData) => void;
+
+  // Environment actions
+  addEnvironment: (name: string) => void;
+  updateEnvironment: (
+    id: string,
+    name: string,
+    variables: EnvironmentVariable[]
+  ) => void;
+  deleteEnvironment: (id: string) => void;
+  setActiveEnvironment: (id: string | null) => void;
+
   initializeMockData: () => void;
   importWorkspace: (data: {
     nodes: Record<string, TreeNode>;
     rootIds: string[];
+    environments?: Environment[];
   }) => void;
 }
 
@@ -56,6 +70,8 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
       activeRequestId: null,
       openRequestIds: [],
       responses: {},
+      environments: [],
+      activeEnvironmentId: null,
 
       addNode: (parentId, type, name) => {
         const id = uuidv4();
@@ -279,6 +295,38 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         }));
       },
 
+      addEnvironment: (name) => {
+        const newEnv: Environment = {
+          id: uuidv4(),
+          name,
+          variables: [],
+        };
+        set((state) => ({
+          environments: [...state.environments, newEnv],
+          activeEnvironmentId: state.activeEnvironmentId || newEnv.id,
+        }));
+      },
+
+      updateEnvironment: (id, name, variables) => {
+        set((state) => ({
+          environments: state.environments.map((env) =>
+            env.id === id ? { ...env, name, variables } : env
+          ),
+        }));
+      },
+
+      deleteEnvironment: (id) => {
+        set((state) => ({
+          environments: state.environments.filter((env) => env.id !== id),
+          activeEnvironmentId:
+            state.activeEnvironmentId === id ? null : state.activeEnvironmentId,
+        }));
+      },
+
+      setActiveEnvironment: (id) => {
+        set({ activeEnvironmentId: id });
+      },
+
       importWorkspace: (data) => {
         set({
           nodes: data.nodes,
@@ -286,6 +334,8 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           activeRequestId: null,
           openRequestIds: [],
           responses: {},
+          environments: data.environments || [],
+          activeEnvironmentId: data.environments?.[0]?.id || null,
         });
       },
 
@@ -293,7 +343,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         const { nodes } = get();
         if (Object.keys(nodes).length > 0) return;
 
-        const { addNode } = get();
+        const { addNode, addEnvironment } = get();
 
         // Clear existing
         set({
@@ -302,7 +352,29 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           activeRequestId: null,
           openRequestIds: [],
           responses: {},
+          environments: [],
+          activeEnvironmentId: null,
         });
+
+        // Add Mock Environment
+        addEnvironment("Local Development");
+        const envs = get().environments;
+        if (envs.length > 0) {
+          get().updateEnvironment(envs[0].id, "Local Development", [
+            {
+              id: uuidv4(),
+              key: "base_url",
+              value: "https://jsonplaceholder.typicode.com",
+              enabled: true,
+            },
+            {
+              id: uuidv4(),
+              key: "token",
+              value: "secret-token-123",
+              enabled: true,
+            },
+          ]);
+        }
 
         const wsId = addNode(null, "workspace", "My Workspace");
 
@@ -349,6 +421,8 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         rootIds: state.rootIds,
         activeRequestId: state.activeRequestId,
         openRequestIds: state.openRequestIds,
+        environments: state.environments,
+        activeEnvironmentId: state.activeEnvironmentId,
       }),
     }
   )

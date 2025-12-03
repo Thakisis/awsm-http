@@ -2,7 +2,10 @@ import { ResponseData } from "@/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Editor, type Monaco } from "@monaco-editor/react";
 import { VesperTheme } from "./themes/vesper";
+import { VesperLightTheme } from "./themes/vesper-light";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/theme-provider";
+import { useState, useEffect } from "react";
 
 interface ResponseViewerProps {
   response: ResponseData;
@@ -10,9 +13,12 @@ interface ResponseViewerProps {
 
 const handleEditorDidMount = (monaco: Monaco) => {
   monaco.editor.defineTheme("Vesper", VesperTheme as any);
+  monaco.editor.defineTheme("VesperLight", VesperLightTheme as any);
 };
 
 export function ResponseViewer({ response }: ResponseViewerProps) {
+  const { theme } = useTheme();
+
   const isSuccess = response.status >= 200 && response.status < 300;
   const isError = response.status >= 400;
 
@@ -81,7 +87,7 @@ export function ResponseViewer({ response }: ResponseViewerProps) {
                   ? response.body
                   : JSON.stringify(response.body, null, 2)
               }
-              theme="Vesper"
+              theme={theme === "dark" ? "Vesper" : "VesperLight"}
               beforeMount={handleEditorDidMount}
               options={{
                 readOnly: true,

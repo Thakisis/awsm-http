@@ -15,6 +15,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { EnvironmentSelector } from "../environments/environment-selector";
 
 export function Sidebar() {
   const rootIds = useWorkspaceStore((state) => state.rootIds);
@@ -34,6 +35,9 @@ export function Sidebar() {
 
   return (
     <div className="h-full border-r bg-muted/10 flex flex-col">
+      <div className="p-2 border-b">
+        <EnvironmentSelector />
+      </div>
       <div className="p-2 flex items-center justify-between group">
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Explorer
