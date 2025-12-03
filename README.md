@@ -11,7 +11,7 @@
 - **📝 Advanced Request Editor**:
   - Support for all standard HTTP methods (GET, POST, PUT, DELETE, PATCH).
   - **Params**: Easy-to-use key-value editor for query parameters.
-  - **Auth**: Built-in support for Basic Auth, Bearer Token, and API Key.
+  - **Auth**: Built-in support for Basic Auth, Bearer Token, API Key, and **OAuth 2.0** (Client Credentials).
   - **Body**: Support for JSON, Form Data, x-www-form-urlencoded, and Raw text/XML/HTML.
   - **Monaco Editor**: Integrated [Monaco Editor](https://microsoft.github.io/monaco-editor/) (VS Code's editor) for a powerful coding experience when editing JSON bodies.
 - **📄 Response Viewer**:
@@ -22,8 +22,12 @@
 - **📂 Workspace Management**:
   - Organize requests into Workspaces and Collections (Folders).
   - **Environments**: Manage variables (e.g., `{{base_url}}`) across different environments.
+  - **Import/Export**: Share your workspace via JSON files or import from Postman.
+  - **Reset**: "Danger Zone" to wipe data and restore defaults.
   - **Local Persistence**: Your workspace is automatically saved to local storage.
 - **⚡ Keyboard First**: Designed for developer productivity.
+  - **Command Palette**: `Ctrl+K` to access quick actions and Faker.
+  - **Tabs**: Middle-click to close tabs.
 
 ## 🔮 Advanced Capabilities
 

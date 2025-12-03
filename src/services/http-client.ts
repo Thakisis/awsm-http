@@ -20,6 +20,37 @@ export class HttpClient {
         }
       });
 
+      // Handle Auth
+      if (request.auth) {
+        if (request.auth.type === "basic" && request.auth.basic) {
+          const { username, password } = request.auth.basic;
+          if (username || password) {
+            const token = btoa(`${username || ""}:${password || ""}`);
+            headers["Authorization"] = `Basic ${token}`;
+          }
+        } else if (request.auth.type === "bearer" && request.auth.bearer) {
+          const { token } = request.auth.bearer;
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+        } else if (request.auth.type === "apikey" && request.auth.apikey) {
+          const { key, value, addTo } = request.auth.apikey;
+          if (key && value) {
+            if (addTo === "header") {
+              headers[key] = value;
+            } else if (addTo === "query") {
+              const separator = request.url.includes("?") ? "&" : "?";
+              request.url += `${separator}${key}=${encodeURIComponent(value)}`;
+            }
+          }
+        } else if (request.auth.type === "oauth2" && request.auth.oauth2) {
+          const { token } = request.auth.oauth2;
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+        }
+      }
+
       let body: string | null = null;
       if (request.method !== "GET" && request.body.type !== "none") {
         body = request.body.content;

@@ -18,10 +18,20 @@ export interface RequestParam {
 }
 
 export interface RequestAuth {
-  type: "none" | "basic" | "bearer" | "apikey";
+  type: "none" | "basic" | "bearer" | "apikey" | "oauth2";
   basic?: { username?: string; password?: string };
   bearer?: { token?: string };
   apikey?: { key?: string; value?: string; addTo?: "header" | "query" };
+  oauth2?: {
+    grantType: "authorization_code" | "client_credentials";
+    accessTokenUrl: string;
+    authUrl?: string;
+    redirectUrl?: string;
+    clientId: string;
+    clientSecret: string;
+    scope?: string;
+    token?: string;
+  };
 }
 
 export interface FormDataItem {
