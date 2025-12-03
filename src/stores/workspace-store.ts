@@ -462,6 +462,12 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             content:
               '{\n  "username": "admin",\n  "password": "password123"\n}',
           },
+          testScript: `// Example: Extract token and set to environment variable
+// const data = awsm.response.body;
+// if (data.token) {
+//   awsm.variables.set("token", data.token);
+//   awsm.log("Token updated!");
+// }`,
         });
 
         const usersFolderId = addNode(wsId, "collection", "Users");
@@ -470,6 +476,10 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           url: "https://jsonplaceholder.typicode.com/users",
           method: "GET",
           body: { type: "none", content: "" },
+          preRequestScript: `awsm.log("Fetching users list...");`,
+          testScript: `if (awsm.response.status === 200) {
+  awsm.log("Users fetched successfully. Count: " + (Array.isArray(awsm.response.body) ? awsm.response.body.length : 0));
+}`,
         });
 
         const createUserReqId = addNode(
