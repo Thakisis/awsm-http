@@ -4,13 +4,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme-provider";
-import { MoonIcon, SunIcon, LaptopIcon } from "lucide-react";
+import {
+  MoonIcon,
+  SunIcon,
+  LaptopIcon,
+  Trash2Icon,
+  AlertTriangle,
+} from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { AVAILABLE_LOCALES } from "@/services/faker-service";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -26,9 +46,18 @@ interface SettingsDialogProps {
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { theme, setTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState("appearance");
+  const [activeTab, setActiveTab] = useState("general");
   const fakerLocale = useWorkspaceStore((state) => state.fakerLocale);
   const setFakerLocale = useWorkspaceStore((state) => state.setFakerLocale);
+  const initializeMockData = useWorkspaceStore(
+    (state) => state.initializeMockData
+  );
+
+  const handleResetConfirm = () => {
+    initializeMockData(true);
+    toast.success("Workspace reset successfully");
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -41,17 +70,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               <div
                 className={cn(
                   "px-2 py-1.5 text-sm font-medium rounded-md cursor-pointer",
-                  activeTab === "appearance"
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-muted"
-                )}
-                onClick={() => setActiveTab("appearance")}
-              >
-                Appearance
-              </div>
-              <div
-                className={cn(
-                  "px-2 py-1.5 text-sm font-medium rounded-md cursor-pointer",
                   activeTab === "general"
                     ? "bg-accent text-accent-foreground"
                     : "hover:bg-muted"
@@ -59,6 +77,17 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 onClick={() => setActiveTab("general")}
               >
                 General
+              </div>
+              <div
+                className={cn(
+                  "px-2 py-1.5 text-sm font-medium rounded-md cursor-pointer",
+                  activeTab === "appearance"
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-muted"
+                )}
+                onClick={() => setActiveTab("appearance")}
+              >
+                Appearance
               </div>
             </div>
           </div>
@@ -139,6 +168,55 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       Select the language for generated fake data (e.g. names,
                       addresses).
                     </p>
+                  </div>
+
+                  <div className="pt-6 border-t">
+                    <h3 className="text-sm font-medium text-destructive mb-4">
+                      Danger Zone
+                    </h3>
+                    <div className="flex flex-col gap-4 p-4 border border-destructive/20 rounded-lg bg-destructive/5">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h4 className="font-medium text-sm">
+                            Reset Workspace
+                          </h4>
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                              <Trash2Icon className="w-4 h-4 mr-2" />
+                              Reset All
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete your workspace data and reset
+                                it to the default state.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleResetConfirm}>
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                      <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Warning</AlertTitle>
+                        <AlertDescription>
+                          Delete all collections, requests, and environments and
+                          reset to default.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
                   </div>
                 </div>
               </>

@@ -75,11 +75,11 @@ export function ImportExportDialog({ children }: ImportExportDialogProps) {
           setOpen(false);
           toast.success("Workspace imported successfully");
         } else {
-          alert("Invalid workspace file format");
+          toast.error("Invalid workspace file format");
         }
       } catch (error) {
         console.error("Error parsing JSON:", error);
-        alert("Error parsing JSON file");
+        toast.error("Error parsing JSON file");
       }
     };
     reader.readAsText(file);
@@ -99,7 +99,7 @@ export function ImportExportDialog({ children }: ImportExportDialogProps) {
         setOpen(false);
       } catch (error) {
         console.error("Error parsing Postman JSON:", error);
-        alert("Error parsing Postman JSON file");
+        toast.error("Error parsing Postman JSON file");
       }
     };
     reader.readAsText(file);

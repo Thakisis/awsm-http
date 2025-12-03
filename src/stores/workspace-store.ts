@@ -53,7 +53,7 @@ interface WorkspaceActions {
   // Settings actions
   setFakerLocale: (locale: string) => void;
 
-  initializeMockData: () => void;
+  initializeMockData: (force?: boolean) => void;
   importWorkspace: (data: {
     nodes: Record<string, TreeNode>;
     rootIds: string[];
@@ -423,9 +423,9 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         }));
       },
 
-      initializeMockData: () => {
+      initializeMockData: (force = false) => {
         const { nodes } = get();
-        if (Object.keys(nodes).length > 0) return;
+        if (!force && Object.keys(nodes).length > 0) return;
 
         const { addNode, addEnvironment } = get();
 

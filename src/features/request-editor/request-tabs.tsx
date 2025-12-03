@@ -40,6 +40,12 @@ export function RequestTabs() {
                   : "text-muted-foreground"
               )}
               onClick={() => setActiveRequest(id)}
+              onMouseDown={(e) => {
+                if (e.button === 1) {
+                  e.preventDefault();
+                  closeTab(id);
+                }
+              }}
             >
               <div className="flex items-center gap-2 truncate">
                 <span
