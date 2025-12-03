@@ -21,9 +21,46 @@
   - Status code, time, and size metrics.
 - **📂 Workspace Management**:
   - Organize requests into Workspaces and Collections (Folders).
-  - Drag-and-drop organization (planned).
+  - **Environments**: Manage variables (e.g., `{{base_url}}`) across different environments.
   - **Local Persistence**: Your workspace is automatically saved to local storage.
 - **⚡ Keyboard First**: Designed for developer productivity.
+
+## 🔮 Advanced Capabilities
+
+### 🧪 Automated Testing
+
+Write tests in JavaScript to validate your API responses automatically.
+
+- **Test Runner**: Tests run immediately after a request.
+- **Visual Results**: See pass/fail status in the dedicated "Tests" sidebar.
+- **Dynamic Descriptions**: Log custom messages for your tests.
+
+```javascript
+awsm.test("Status is 200", (log) => {
+  if (awsm.response.status !== 200) throw new Error("Failed");
+  log("Server responded with " + awsm.response.status);
+});
+```
+
+### 🎲 Dynamic Data (Faker.js)
+
+Generate realistic test data on the fly using the built-in Faker.js integration.
+
+- **Quick Insert**: Press `Ctrl+K` (or `Cmd+K`) in any editor to open the Faker dialog.
+- **Syntax**: Use `{{faker.module.method()}}` in your JSON bodies.
+- **Arguments**: Pass arguments like `{{faker.date.future({ years: 1 })}}`.
+
+### 📜 Scripting Engine
+
+Powerful pre-request and test scripts with the `awsm` global object.
+
+- **Variables**: `awsm.variables.set("token", "...")`
+- **Logging**: `awsm.log("Message")`
+- **Access**: Full access to request and response objects.
+
+### 📚 Built-in Documentation
+
+Access the full documentation directly within the app by clicking the book icon in the navigation bar.
 
 ## 🛠️ Tech Stack
 
