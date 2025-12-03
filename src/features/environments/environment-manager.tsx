@@ -34,9 +34,6 @@ export function EnvironmentManager() {
   const deleteEnvironment = useWorkspaceStore(
     (state) => state.deleteEnvironment
   );
-  const setActiveEnvironment = useWorkspaceStore(
-    (state) => state.setActiveEnvironment
-  );
 
   const [selectedEnvId, setSelectedEnvId] = useState<string | null>(null);
 

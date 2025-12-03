@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import { SettingsIcon, BoxIcon, SearchIcon, BookIcon } from "lucide-react";
-import { useWorkspaceStore } from "@/stores/workspace-store";
 
 import { CommandPalette } from "./command-palette";
 import { SettingsDialog } from "./settings-dialog";
@@ -14,27 +13,6 @@ export function Navbar() {
   const [openCommand, setOpenCommand] = useState(false);
   const [openSettings, setOpenSettings] = useState(false);
   const [openDocumentation, setOpenDocumentation] = useState(false);
-
-  const activeRequestId = useWorkspaceStore((state) => state.activeRequestId);
-  const nodes = useWorkspaceStore((state) => state.nodes);
-
-  // Calculate breadcrumbs and current workspace name
-  const getPath = (nodeId: string | null) => {
-    const path = [];
-    let currentId = nodeId;
-    while (currentId) {
-      const node = nodes[currentId];
-      if (node) {
-        path.unshift(node);
-        currentId = node.parentId;
-      } else {
-        break;
-      }
-    }
-    return path;
-  };
-
-  const path = getPath(activeRequestId);
 
   return (
     <>

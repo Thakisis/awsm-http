@@ -5,7 +5,6 @@ import { VesperTheme } from "./themes/vesper";
 import { VesperLightTheme } from "./themes/vesper-light";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/theme-provider";
-import { useState, useEffect } from "react";
 import { TypeGeneratorDialog } from "./type-generator-dialog";
 
 interface ResponseViewerProps {
