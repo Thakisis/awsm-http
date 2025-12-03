@@ -38,6 +38,46 @@ const handleEditorDidMount = (monaco: Monaco) => {
   monaco.editor.defineTheme("Vesper", VesperTheme as any);
   monaco.editor.defineTheme("VesperLight", VesperLightTheme as any);
 
+  // Add type definitions for 'awsm' global in JavaScript
+  monaco.languages.typescript.javascriptDefaults.addExtraLib(
+    `
+    /**
+     * The global object available in Pre-request and Test scripts.
+     */
+    declare const awsm: {
+      variables: {
+        /** Get an environment variable */
+        get(key: string): string | undefined;
+        /** Set an environment variable */
+        set(key: string, value: string): void;
+      };
+      /** Log messages to the console and toast */
+      log(...args: any[]): void;
+      /** The current request object */
+      request?: {
+        url: string;
+        method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+        headers: Array<{ key: string; value: string; enabled: boolean }>;
+        body: {
+          type: "json" | "text" | "xml" | "html" | "form-data" | "x-www-form-urlencoded" | "binary" | "none";
+          content: string;
+        };
+      };
+      /** The response object (only available in Test scripts) */
+      response?: {
+        status: number;
+        statusText: string;
+        time: number;
+        size: number;
+        headers: Record<string, string>;
+        body: any;
+        rawBody: string;
+      };
+    };
+    `,
+    "ts:filename/awsm.d.ts"
+  );
+
   // Register completion provider for JSON
   monaco.languages.registerCompletionItemProvider("json", {
     triggerCharacters: ["{"],

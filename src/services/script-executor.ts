@@ -1,4 +1,4 @@
-import { RequestData, ResponseData, EnvironmentVariable } from "@/types";
+import { RequestData, ResponseData } from "@/types";
 
 interface ScriptContext {
   request?: RequestData;
