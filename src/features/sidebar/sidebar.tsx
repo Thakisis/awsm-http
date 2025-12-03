@@ -150,7 +150,7 @@ export function Sidebar() {
           value="explorer"
           className="flex-1 flex flex-col min-h-0 m-0 "
         >
-          <div className="px-2 pb-2 flex items-center justify-between group">
+          <div className="px-2 flex items-center justify-between group">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Collections
             </span>
@@ -181,7 +181,7 @@ export function Sidebar() {
           <ContextMenu>
             <ContextMenuTrigger className="flex-1 flex flex-col min-h-0">
               <ScrollArea className="flex-1">
-                <div className="p-2 min-h-full">
+                <div className=" min-h-full">
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}

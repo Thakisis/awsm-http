@@ -36,6 +36,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { Badge } from "@/components/ui/badge";
 
 interface SidebarItemProps {
   nodeId: string;
@@ -124,6 +125,23 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
       ? PlugIcon
       : FileJsonIcon;
 
+  const getMethodColor = (method: string) => {
+    switch (method) {
+      case "GET":
+        return "bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20";
+      case "POST":
+        return "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border-yellow-500/20";
+      case "PUT":
+        return "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-500/20";
+      case "DELETE":
+        return "bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20";
+      case "PATCH":
+        return "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border-yellow-500/20";
+      default:
+        return "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20 border-gray-500/20";
+    }
+  };
+
   return (
     <div ref={setNodeRef} style={style}>
       <ContextMenu>
@@ -172,6 +190,18 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
               />
             ) : (
               <span className="truncate flex-1">{node.name}</span>
+            )}
+
+            {node.type === "request" && node.data?.method && (
+              <Badge
+                variant="outline"
+                className={cn(
+                  "ml-2 text-[10px] px-1 py-0 h-4 font-mono uppercase tracking-tighter",
+                  getMethodColor(node.data.method)
+                )}
+              >
+                {node.data.method}
+              </Badge>
             )}
 
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
