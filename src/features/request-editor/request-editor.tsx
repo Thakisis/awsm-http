@@ -20,6 +20,7 @@ import {
   EyeOffIcon,
 } from "lucide-react";
 
+import { RequestTabs } from "./request-tabs";
 import { ResponseViewer } from "./response-viewer";
 import { HttpMethod, RequestAuth } from "@/types";
 import { v4 as uuidv4 } from "uuid";
@@ -309,18 +310,21 @@ export function RequestEditor() {
 
   if (!activeRequestId || !node || node.type !== "request" || !node.data) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground">
-        <Empty>
-          <EmptyMedia>
-            <RocketIcon className="text-muted-foreground" />
-          </EmptyMedia>
-          <EmptyHeader>
-            <EmptyTitle>No Request Selected</EmptyTitle>
-            <EmptyDescription>
-              Select a request from the sidebar to start editing.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+      <div className="h-full flex flex-col">
+        <RequestTabs />
+        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <Empty>
+            <EmptyMedia>
+              <RocketIcon className="text-muted-foreground" />
+            </EmptyMedia>
+            <EmptyHeader>
+              <EmptyTitle>No Request Selected</EmptyTitle>
+              <EmptyDescription>
+                Select a request from the sidebar to start editing.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
       </div>
     );
   }
@@ -458,6 +462,7 @@ export function RequestEditor() {
 
   return (
     <div className="h-full flex flex-col">
+      <RequestTabs />
       {/* Top Bar: Method, URL, Send */}
       <div className="p-4 border-b flex gap-2 items-center bg-background">
         <Select

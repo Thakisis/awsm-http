@@ -16,6 +16,9 @@ interface WorkspaceActions {
   updateRequestData: (id: string, data: Partial<RequestData>) => void;
   toggleExpand: (id: string) => void;
   setActiveRequest: (id: string | null) => void;
+  closeTab: (id: string) => void;
+  closeOtherTabs: (id: string) => void;
+  closeAllTabs: () => void;
   setResponse: (requestId: string, response: ResponseData) => void;
   initializeMockData: () => void;
   importWorkspace: (data: {
@@ -51,6 +54,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
       nodes: {},
       rootIds: [],
       activeRequestId: null,
+      openRequestIds: [],
       responses: {},
 
       addNode: (parentId, type, name) => {
@@ -133,17 +137,29 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             newRootIds = newRootIds.filter((rootId) => rootId !== id);
           }
 
-          // 4. Update active request
+          // 4. Update active request and open tabs
           // Only deselect if the active request is actually being deleted
           let newActiveRequestId = state.activeRequestId;
+          let newOpenRequestIds = [...state.openRequestIds];
+
+          // Remove deleted nodes from open tabs
+          newOpenRequestIds = newOpenRequestIds.filter(
+            (id) => !idsToDelete.has(id)
+          );
+
           if (newActiveRequestId && idsToDelete.has(newActiveRequestId)) {
-            newActiveRequestId = null;
+            // If active request is deleted, try to switch to another open tab
+            newActiveRequestId =
+              newOpenRequestIds.length > 0
+                ? newOpenRequestIds[newOpenRequestIds.length - 1]
+                : null;
           }
 
           return {
             nodes: newNodes,
             rootIds: newRootIds,
             activeRequestId: newActiveRequestId,
+            openRequestIds: newOpenRequestIds,
           };
         });
       },
@@ -188,7 +204,70 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
       },
 
       setActiveRequest: (id) => {
-        set({ activeRequestId: id });
+        set((state) => {
+          if (!id) return { activeRequestId: null };
+
+          const newOpenRequestIds = [...state.openRequestIds];
+          if (!newOpenRequestIds.includes(id)) {
+            newOpenRequestIds.push(id);
+          }
+
+          return {
+            activeRequestId: id,
+            openRequestIds: newOpenRequestIds,
+          };
+        });
+      },
+
+      closeTab: (id) => {
+        set((state) => {
+          const newOpenRequestIds = state.openRequestIds.filter(
+            (tabId) => tabId !== id
+          );
+          let newActiveRequestId = state.activeRequestId;
+
+          if (state.activeRequestId === id) {
+            // If closing the active tab, switch to the next available one (or previous)
+            // Logic: try to go to the one to the right, if not, the one to the left
+            // Actually, standard browser behavior is usually to go to the right, unless it was the last one, then left.
+            // But simpler logic: just pick the last one in the new list for now, or maintain index.
+            // Let's try to be smart: find index of closed tab
+            const closedIndex = state.openRequestIds.indexOf(id);
+
+            if (newOpenRequestIds.length === 0) {
+              newActiveRequestId = null;
+            } else if (closedIndex >= newOpenRequestIds.length) {
+              // It was the last one, so pick the new last one
+              newActiveRequestId =
+                newOpenRequestIds[newOpenRequestIds.length - 1];
+            } else {
+              // Pick the one that is now at the same index (which was to the right)
+              newActiveRequestId = newOpenRequestIds[closedIndex];
+            }
+          }
+
+          return {
+            openRequestIds: newOpenRequestIds,
+            activeRequestId: newActiveRequestId,
+          };
+        });
+      },
+
+      closeOtherTabs: (id) => {
+        set((state) => {
+          if (!state.openRequestIds.includes(id)) return state;
+          return {
+            openRequestIds: [id],
+            activeRequestId: id,
+          };
+        });
+      },
+
+      closeAllTabs: () => {
+        set({
+          openRequestIds: [],
+          activeRequestId: null,
+        });
       },
 
       setResponse: (requestId, response) => {
@@ -205,6 +284,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           nodes: data.nodes,
           rootIds: data.rootIds,
           activeRequestId: null,
+          openRequestIds: [],
           responses: {},
         });
       },
@@ -216,7 +296,13 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         const { addNode } = get();
 
         // Clear existing
-        set({ nodes: {}, rootIds: [], activeRequestId: null, responses: {} });
+        set({
+          nodes: {},
+          rootIds: [],
+          activeRequestId: null,
+          openRequestIds: [],
+          responses: {},
+        });
 
         const wsId = addNode(null, "workspace", "My Workspace");
 
@@ -262,6 +348,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         nodes: state.nodes,
         rootIds: state.rootIds,
         activeRequestId: state.activeRequestId,
+        openRequestIds: state.openRequestIds,
       }),
     }
   )

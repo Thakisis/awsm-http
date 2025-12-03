@@ -81,5 +81,6 @@ export interface WorkspaceState {
   nodes: Record<string, TreeNode>;
   rootIds: string[];
   activeRequestId: string | null;
+  openRequestIds: string[];
   responses: Record<string, ResponseData | null>;
 }
