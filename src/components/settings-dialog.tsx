@@ -104,7 +104,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <div className="space-y-2">
                     <Label>Theme</Label>
                     <div className="grid 2xl:grid-cols-3 gap-4 grid-cols-2">
-                      <div
+                      <button
                         className={`flex flex-col items-center gap-2 cursor-pointer p-2 rounded-md border-2 ${
                           theme === "light"
                             ? "border-primary"
@@ -112,10 +112,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         }`}
                         onClick={() => setTheme("light")}
                       >
-                        <SunIcon className="h-6 w-6" />
+                        <SunIcon />
                         <span className="text-sm font-medium">Light</span>
-                      </div>
-                      <div
+                      </button>
+                      <button
                         className={`flex flex-col items-center gap-2 cursor-pointer p-2 rounded-md border-2 ${
                           theme === "dark"
                             ? "border-primary"
@@ -123,10 +123,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         }`}
                         onClick={() => setTheme("dark")}
                       >
-                        <MoonIcon className="h-6 w-6" />
+                        <MoonIcon />
                         <span className="text-sm font-medium">Dark</span>
-                      </div>
-                      <div
+                      </button>
+                      <button
                         className={`flex flex-col items-center gap-2 cursor-pointer p-2 rounded-md border-2 ${
                           theme === "system"
                             ? "border-primary"
@@ -134,9 +134,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         }`}
                         onClick={() => setTheme("system")}
                       >
-                        <LaptopIcon className="h-6 w-6" />
+                        <LaptopIcon />
                         <span className="text-sm font-medium">System</span>
-                      </div>
+                      </button>
                     </div>
                   </div>
                 </div>

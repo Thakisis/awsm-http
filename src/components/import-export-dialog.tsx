@@ -6,12 +6,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Item } from "@/components/ui/item";
-import { DownloadIcon, UploadIcon, FileJsonIcon } from "lucide-react";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemMedia,
+} from "@/components/ui/item";
+import {
+  DownloadIcon,
+  UploadIcon,
+  FileJsonIcon,
+  ChevronRightIcon,
+} from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { v4 as uuidv4 } from "uuid";
 import { RequestData } from "@/types";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
 
 interface ImportExportDialogProps {
   children: React.ReactNode;
@@ -241,38 +253,65 @@ export function ImportExportDialog({ children }: ImportExportDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] gap-0 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[425px] gap-0 p-0 overflow-hidden border-primary/30">
         <DialogHeader className="px-4 py-3 border-b bg-muted/30">
           <DialogTitle>Import / Export</DialogTitle>
         </DialogHeader>
-        <div className="p-2">
-          <Item onClick={handleImportClick}>
-            <UploadIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <div className="flex flex-col gap-0.5">
-              <span className="font-medium">Import Workspace</span>
-              <span className="text-xs text-muted-foreground">
-                Restore from a JSON file
-              </span>
-            </div>
+        <div className="flex flex-col gap-2 p-2">
+          <Item variant={"outline"} asChild>
+            <button onClick={handleImportClick}>
+              <ItemMedia>
+                <UploadIcon className="text-muted-foreground" />
+              </ItemMedia>
+              <ItemContent>
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-medium">Import Workspace</span>
+                  <span className="text-xs text-muted-foreground">
+                    Restore from a JSON file
+                  </span>
+                </div>
+              </ItemContent>
+              <ItemActions>
+                <ChevronRightIcon className="size-4" />
+              </ItemActions>
+            </button>
           </Item>
-          <Item onClick={handleExport}>
-            <DownloadIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <div className="flex flex-col gap-0.5">
-              <span className="font-medium">Export Workspace</span>
-              <span className="text-xs text-muted-foreground">
-                Save your current workspace to a JSON file
-              </span>
-            </div>
+          <Item variant={"outline"} asChild>
+            <button onClick={handleExport}>
+              <ItemMedia>
+                <DownloadIcon className="text-muted-foreground" />
+              </ItemMedia>
+              <ItemContent>
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-medium">Export Workspace</span>
+                  <span className="text-xs text-muted-foreground">
+                    Save current workspace to a JSON file
+                  </span>
+                </div>
+              </ItemContent>
+              <ItemActions>
+                <ChevronRightIcon className="size-4" />
+              </ItemActions>
+            </button>
           </Item>
-          <div className="my-1 border-t mx-2" />
-          <Item onClick={handlePostmanImportClick}>
-            <FileJsonIcon className="mr-2 h-4 w-4 text-orange-500" />
-            <div className="flex flex-col gap-0.5">
-              <span className="font-medium">Import from Postman</span>
-              <span className="text-xs text-muted-foreground">
-                Import a Postman Collection (v2.1)
-              </span>
-            </div>
+          <Separator orientation="horizontal" className="bg-primary/30" />
+          <Item variant={"outline"} asChild>
+            <button onClick={handlePostmanImportClick}>
+              <ItemMedia>
+                <FileJsonIcon className="text-orange-500" />
+              </ItemMedia>
+              <ItemContent>
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-medium">Import from Postman</span>
+                  <span className="text-xs text-muted-foreground">
+                    Import a Postman Collection (v2.1)
+                  </span>
+                </div>
+              </ItemContent>
+              <ItemActions>
+                <ChevronRightIcon className="size-4" />
+              </ItemActions>
+            </button>
           </Item>
         </div>
         <input

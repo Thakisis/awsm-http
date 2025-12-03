@@ -57,7 +57,7 @@ export function DocumentationDialog({
       <DialogContent className="sm:max-w-5xl h-[80vh] flex flex-col p-0 gap-0">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <BookIcon className="w-5 h-5" /> Documentation
+            <BookIcon /> Documentation
           </DialogTitle>
           <DialogDescription>
             Learn how to use the advanced features of awsm-http.
@@ -77,21 +77,21 @@ export function DocumentationDialog({
                   value="faker"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-primary border-b-2 border-transparent  px-0 py-2"
                 >
-                  <Wand2Icon className="w-4 h-4 mr-2" />
+                  <Wand2Icon />
                   Faker & Variables
                 </TabsTrigger>
                 <TabsTrigger
                   value="tests"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-primary border-b-2 border-transparent  px-0 py-2"
                 >
-                  <BeakerIcon className="w-4 h-4 mr-2" />
+                  <BeakerIcon />
                   Testing
                 </TabsTrigger>
                 <TabsTrigger
                   value="scripting"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-primary border-b-2 border-transparent  px-0 py-2"
                 >
-                  <CodeIcon className="w-4 h-4 mr-2" />
+                  <CodeIcon />
                   Scripting API
                 </TabsTrigger>
               </TabsList>

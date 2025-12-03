@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RequestTabs } from "./request-tabs";
 
 interface WebSocketEditorProps {
   requestId: string;
@@ -90,8 +91,30 @@ export function WebSocketEditor({ requestId }: WebSocketEditorProps) {
   const handleSend = () => {
     if (!messageInput) return;
     try {
-      const message = substituteVariables(messageInput, variables, fakerLocale);
-      WebSocketClient.send(requestId, message);
+      const substitutedInput = substituteVariables(
+        messageInput,
+        variables,
+        fakerLocale
+      );
+      let messageToSend = substitutedInput;
+
+      if (node.wsData?.type === "socket.io") {
+        const eventName = node.wsData.eventName || "message";
+        let data = substitutedInput;
+        try {
+          data = JSON.parse(substitutedInput);
+        } catch {
+          // keep as string
+        }
+
+        const payload = {
+          event: eventName,
+          data: data,
+        };
+        messageToSend = JSON.stringify(payload);
+      }
+
+      WebSocketClient.send(requestId, messageToSend);
       setMessageInput("");
     } catch (e) {
       // Error handled in client or ignored
@@ -111,6 +134,7 @@ export function WebSocketEditor({ requestId }: WebSocketEditorProps) {
 
   return (
     <div className="flex flex-col h-full">
+      <RequestTabs />
       {/* Header / URL Bar */}
       <div className="p-4 border-b flex gap-2 items-center">
         <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-md text-xs font-bold text-purple-500">
@@ -223,6 +247,17 @@ export function WebSocketEditor({ requestId }: WebSocketEditorProps) {
         {/* Message Input */}
         <div className="p-4 border-t bg-background">
           <div className="flex gap-2">
+            {node.wsData?.type === "socket.io" && (
+              <Input
+                value={node.wsData.eventName || ""}
+                onChange={(e) =>
+                  updateWebSocketData(requestId, { eventName: e.target.value })
+                }
+                placeholder="Event (default: message)"
+                className="w-48 font-mono"
+                disabled={!isConnected}
+              />
+            )}
             <Input
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}

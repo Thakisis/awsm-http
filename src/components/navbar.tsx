@@ -46,13 +46,13 @@ export function Navbar() {
 
           <div className="flex items-center gap-2">
             <ImportExportDialog>
-              <Button>
-                <BoxIcon size={18} className="mr-2" />
+              <Button size={"sm"}>
+                <BoxIcon size={18} />
                 Import/Export
               </Button>
             </ImportExportDialog>
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               onClick={() => setOpenDocumentation(true)}
             >

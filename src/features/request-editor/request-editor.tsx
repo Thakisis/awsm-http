@@ -807,7 +807,6 @@ export function RequestEditor() {
   if (node.type === "websocket") {
     return (
       <div className="flex flex-col h-full">
-        <RequestTabs />
         <WebSocketEditor requestId={activeRequestId} />
       </div>
     );

@@ -71,7 +71,7 @@ export function CommandPalette({
           <CommandGroup heading="Requests">
             {requests.map((node) => (
               <CommandItem key={node.id} onSelect={() => handleSelect(node)}>
-                <FileJsonIcon className="mr-2 h-4 w-4" />
+                <FileJsonIcon />
                 <span>{node.name}</span>
               </CommandItem>
             ))}
@@ -82,7 +82,7 @@ export function CommandPalette({
           <CommandGroup heading="Folders">
             {collections.map((node) => (
               <CommandItem key={node.id} onSelect={() => handleSelect(node)}>
-                <FolderIcon className="mr-2 h-4 w-4" />
+                <FolderIcon />
                 <span>{node.name}</span>
               </CommandItem>
             ))}
@@ -93,7 +93,7 @@ export function CommandPalette({
           <CommandGroup heading="Workspaces">
             {workspaces.map((node) => (
               <CommandItem key={node.id} onSelect={() => handleSelect(node)}>
-                <BoxIcon className="mr-2 h-4 w-4" />
+                <BoxIcon />
                 <span>{node.name}</span>
               </CommandItem>
             ))}
@@ -108,7 +108,7 @@ export function CommandPalette({
                 onOpenChange(false);
               }}
             >
-              <SettingsIcon className="mr-2 h-4 w-4" />
+              <SettingsIcon />
               <span>Settings</span>
             </CommandItem>
           </CommandGroup>

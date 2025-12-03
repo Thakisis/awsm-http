@@ -12,6 +12,7 @@ export interface WebSocketRequestData {
   url: string;
   type?: "raw" | "socket.io";
   messages?: WebSocketMessage[];
+  eventName?: string;
 }
 
 export interface RequestHeader {
