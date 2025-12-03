@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-import { SettingsIcon, BoxIcon, SearchIcon } from "lucide-react";
+import { SettingsIcon, BoxIcon, SearchIcon, BookIcon } from "lucide-react";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 import { CommandPalette } from "./command-palette";
 import { SettingsDialog } from "./settings-dialog";
+import { DocumentationDialog } from "./documentation-dialog";
 import { Kbd, KbdGroup } from "./ui/kbd";
 import { ImportExportDialog } from "./import-export-dialog";
 
 export function Navbar() {
   const [openCommand, setOpenCommand] = useState(false);
   const [openSettings, setOpenSettings] = useState(false);
+  const [openDocumentation, setOpenDocumentation] = useState(false);
 
   const activeRequestId = useWorkspaceStore((state) => state.activeRequestId);
   const nodes = useWorkspaceStore((state) => state.nodes);
@@ -74,6 +76,13 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => setOpenDocumentation(true)}
+            >
+              <BookIcon size={18} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setOpenSettings(true)}
             >
               <SettingsIcon size={18} />
@@ -89,6 +98,10 @@ export function Navbar() {
       />
 
       <SettingsDialog open={openSettings} onOpenChange={setOpenSettings} />
+      <DocumentationDialog
+        open={openDocumentation}
+        onOpenChange={setOpenDocumentation}
+      />
     </>
   );
 }
