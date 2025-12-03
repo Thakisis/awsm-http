@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0-beta] - 2025-12-03
+
+### Added
+
+- **Virtualization**: Implemented `@tanstack/react-virtual` for the History sidebar to handle large lists efficiently.
+- **Lazy Loading**: `RequestEditor` is now lazy-loaded to improve initial application startup time.
+- **Drag & Drop Overlay**: Added a visual overlay for dragged items in the sidebar for a native-like feel.
+
+### Changed
+
+- **Architecture**: Complete refactor to **Screaming Architecture**. Codebase is now organized by features (`src/features/*`) instead of technical layers.
+- **Performance**:
+  - Extensive use of `React.memo` and `useCallback` across core components (`SidebarItem`, `RequestTabs`, `ResponseViewer`, etc.) to minimize unnecessary re-renders.
+  - Optimized build configuration with manual chunking for better cacheability.
+- **UX**: Improved Drag & Drop collision detection using `pointerWithin` for more precise item placement.
+- **Cleanup**: Removed legacy `src/services` and `src/stores` directories.
+
 ## [0.1.0] - 2025-12-03
 
 ### Added
