@@ -9,6 +9,7 @@ import {
   NodeType,
   RequestData,
   EnvironmentVariable,
+  WebSocketRequestData,
 } from "@/types";
 
 export interface WorkspaceState {
@@ -28,12 +29,21 @@ interface WorkspaceActions {
   deleteNode: (id: string) => void;
   updateNodeName: (id: string, name: string) => void;
   updateRequestData: (id: string, data: Partial<RequestData>) => void;
+  updateWebSocketData: (
+    id: string,
+    data: Partial<WebSocketRequestData>
+  ) => void;
   toggleExpand: (id: string) => void;
   setActiveRequest: (id: string | null) => void;
   closeTab: (id: string) => void;
   closeOtherTabs: (id: string) => void;
   closeAllTabs: () => void;
   setResponse: (requestId: string, response: ResponseData) => void;
+  moveNode: (
+    nodeId: string,
+    newParentId: string | null,
+    newIndex: number
+  ) => void;
 
   // Environment actions
   addEnvironment: (name: string) => void;
@@ -92,6 +102,10 @@ const DEFAULT_REQUEST_DATA: RequestData = {
 // });`,
 };
 
+const DEFAULT_WEBSOCKET_DATA: WebSocketRequestData = {
+  url: "wss://echo.websocket.org",
+};
+
 export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
   persist(
     (set, get) => ({
@@ -126,9 +140,12 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           parentId,
           name,
           type,
-          children: type !== "request" ? [] : undefined,
+          children:
+            type === "workspace" || type === "collection" ? [] : undefined,
           isExpanded: true,
           data: type === "request" ? { ...DEFAULT_REQUEST_DATA } : undefined,
+          wsData:
+            type === "websocket" ? { ...DEFAULT_WEBSOCKET_DATA } : undefined,
         };
 
         set((state) => {
@@ -249,6 +266,79 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
               },
             },
           };
+        });
+      },
+
+      updateWebSocketData: (id, data) => {
+        set((state) => {
+          const node = state.nodes[id];
+          if (!node || !node.wsData) return state;
+
+          return {
+            nodes: {
+              ...state.nodes,
+              [id]: {
+                ...node,
+                wsData: { ...node.wsData, ...data },
+              },
+            },
+          };
+        });
+      },
+
+      moveNode: (nodeId, newParentId, newIndex) => {
+        set((state) => {
+          const node = state.nodes[nodeId];
+          if (!node) return state;
+
+          const oldParentId = node.parentId;
+          if (oldParentId === newParentId && newIndex < 0) return state;
+
+          const newNodes = { ...state.nodes };
+          let newRootIds = [...state.rootIds];
+
+          // 1. Remove from old parent
+          if (oldParentId) {
+            const oldParent = newNodes[oldParentId];
+            if (oldParent && oldParent.children) {
+              newNodes[oldParentId] = {
+                ...oldParent,
+                children: oldParent.children.filter((id) => id !== nodeId),
+              };
+            }
+          } else {
+            newRootIds = newRootIds.filter((id) => id !== nodeId);
+          }
+
+          // 2. Add to new parent
+          if (newParentId) {
+            const newParent = newNodes[newParentId];
+            if (newParent) {
+              const newChildren = newParent.children
+                ? [...newParent.children]
+                : [];
+
+              if (newIndex < 0) newIndex = 0;
+              if (newIndex > newChildren.length) newIndex = newChildren.length;
+
+              newChildren.splice(newIndex, 0, nodeId);
+
+              newNodes[newParentId] = {
+                ...newParent,
+                children: newChildren,
+                isExpanded: true,
+              };
+            }
+          } else {
+            if (newIndex < 0) newIndex = 0;
+            if (newIndex > newRootIds.length) newIndex = newRootIds.length;
+            newRootIds.splice(newIndex, 0, nodeId);
+          }
+
+          // 3. Update node
+          newNodes[nodeId] = { ...node, parentId: newParentId };
+
+          return { nodes: newNodes, rootIds: newRootIds };
         });
       },
 

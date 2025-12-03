@@ -26,9 +26,11 @@ export function RequestTabs() {
       <div className="flex w-max min-w-full h-full">
         {openRequestIds.map((id) => {
           const node = nodes[id];
-          if (!node || !node.data) return null;
+          if (!node) return null;
+          if (!node.data && !node.wsData) return null;
 
           const isActive = id === activeRequestId;
+          const isWs = node.type === "websocket";
 
           return (
             <div
@@ -51,10 +53,14 @@ export function RequestTabs() {
                 <span
                   className={cn(
                     "text-xs font-bold",
-                    METHOD_COLORS[node.data.method]
+                    isWs
+                      ? "text-purple-500"
+                      : node.data
+                      ? METHOD_COLORS[node.data.method]
+                      : ""
                   )}
                 >
-                  {node.data.method}
+                  {isWs ? "WS" : node.data?.method}
                 </span>
                 <span className="truncate">{node.name}</span>
               </div>

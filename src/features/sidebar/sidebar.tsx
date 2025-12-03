@@ -1,7 +1,7 @@
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { SidebarItem } from "./sidebar-item";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PlusIcon, FolderPlusIcon, FilePlusIcon } from "lucide-react";
+import { PlusIcon, FolderPlusIcon, FilePlusIcon, PlugIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,11 +21,69 @@ import { HistorySidebar } from "./history-sidebar";
 import { TestResultsSidebar } from "./test-results-sidebar";
 import { HistoryIcon, FolderIcon, BeakerIcon } from "lucide-react";
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
 export function Sidebar() {
   const rootIds = useWorkspaceStore((state) => state.rootIds);
+  const nodes = useWorkspaceStore((state) => state.nodes);
   const addNode = useWorkspaceStore((state) => state.addNode);
+  const moveNode = useWorkspaceStore((state) => state.moveNode);
 
-  const handleCreateRoot = (type: "workspace" | "collection" | "request") => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    const activeNode = nodes[activeId];
+    const overNode = nodes[overId];
+
+    if (!activeNode || !overNode) return;
+
+    // Moving relative to overNode (sibling)
+    const newParentId = overNode.parentId;
+    let newIndex = 0;
+
+    if (newParentId) {
+      const parent = nodes[newParentId];
+      if (parent && parent.children) {
+        newIndex = parent.children.indexOf(overId);
+      }
+    } else {
+      newIndex = rootIds.indexOf(overId);
+    }
+
+    moveNode(activeId, newParentId, newIndex);
+  };
+
+  const handleCreateRoot = (
+    type: "workspace" | "collection" | "request" | "websocket"
+  ) => {
     addNode(
       null,
       type,
@@ -33,7 +91,9 @@ export function Sidebar() {
         ? "New Workspace"
         : type === "collection"
         ? "New Folder"
-        : "New Request"
+        : type === "request"
+        ? "New Request"
+        : "New WebSocket"
     );
   };
 
@@ -69,17 +129,20 @@ export function Sidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon-sm">
-                  <PlusIcon size={14} />
+                  <PlusIcon />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   onClick={() => handleCreateRoot("collection")}
                 >
-                  <FolderPlusIcon className="mr-2 h-4 w-4" /> New Collection
+                  <FolderPlusIcon /> New Collection
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleCreateRoot("request")}>
-                  <FilePlusIcon className="mr-2 h-4 w-4" /> New Request
+                  <FilePlusIcon /> New Request
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCreateRoot("websocket")}>
+                  <PlugIcon /> New WebSocket
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -88,28 +151,42 @@ export function Sidebar() {
             <ContextMenuTrigger className="flex-1 flex flex-col min-h-0">
               <ScrollArea className="flex-1">
                 <div className="p-2 min-h-full">
-                  {rootIds.map((id) => (
-                    <SidebarItem key={id} nodeId={id} level={0} />
-                  ))}
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={rootIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {rootIds.map((id) => (
+                        <SidebarItem key={id} nodeId={id} level={0} />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 </div>
               </ScrollArea>
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuItem onClick={() => handleCreateRoot("collection")}>
-                <FolderPlusIcon className="mr-2 h-4 w-4" /> New Collection
+                <FolderPlusIcon /> New Collection
               </ContextMenuItem>
               <ContextMenuItem onClick={() => handleCreateRoot("request")}>
-                <FilePlusIcon className="mr-2 h-4 w-4" /> New Request
+                <FilePlusIcon /> New Request
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleCreateRoot("websocket")}>
+                <PlugIcon /> New WebSocket
               </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
         </TabsContent>
 
-        <TabsContent value="history" className="flex-1 min-h-0 m-0">
+        <TabsContent value="history" className="flex-1 min-h-0">
           <HistorySidebar />
         </TabsContent>
 
-        <TabsContent value="tests" className="flex-1 min-h-0 m-0">
+        <TabsContent value="tests" className="flex-1 min-h-0">
           <TestResultsSidebar />
         </TabsContent>
       </Tabs>

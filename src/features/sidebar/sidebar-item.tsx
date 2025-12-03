@@ -12,6 +12,7 @@ import {
   Trash2Icon,
   Edit2Icon,
   BoxIcon,
+  PlugIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +30,12 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface SidebarItemProps {
   nodeId: string;
@@ -49,6 +56,21 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(node?.name || "");
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: nodeId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   if (!node) return null;
 
   const isExpanded = node.isExpanded;
@@ -56,7 +78,7 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (node.type === "request") {
+    if (node.type === "request" || node.type === "websocket") {
       setActiveRequest(nodeId);
     } else {
       toggleExpand(nodeId);
@@ -64,7 +86,15 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
   };
 
   const handleCreate = (type: NodeType) => {
-    addNode(nodeId, type, type === "collection" ? "New Folder" : "New Request");
+    addNode(
+      nodeId,
+      type,
+      type === "collection"
+        ? "New Folder"
+        : type === "request"
+        ? "New Request"
+        : "New WebSocket"
+    );
     // No need to toggleExpand here, addNode handles it
   };
 
@@ -90,10 +120,12 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
       ? BoxIcon
       : node.type === "collection"
       ? FolderIcon
+      : node.type === "websocket"
+      ? PlugIcon
       : FileJsonIcon;
 
   return (
-    <div>
+    <div ref={setNodeRef} style={style}>
       <ContextMenu>
         <ContextMenuTrigger>
           <div
@@ -103,9 +135,12 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
             )}
             style={{ paddingLeft: `${level * 12 + 8}px` }}
             onClick={handleClick}
+            {...attributes}
+            {...listeners}
           >
             <div className="w-4 h-4 flex items-center justify-center shrink-0 text-muted-foreground">
               {node.type !== "request" &&
+                node.type !== "websocket" &&
                 (isExpanded ? (
                   <ChevronDownIcon size={14} />
                 ) : (
@@ -117,7 +152,11 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
               size={16}
               className={cn(
                 "shrink-0",
-                node.type === "request" ? "text-blue-500" : "text-yellow-500"
+                node.type === "request"
+                  ? "text-blue-500"
+                  : node.type === "websocket"
+                  ? "text-purple-500"
+                  : "text-yellow-500"
               )}
             />
 
@@ -146,30 +185,36 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48">
-                  {node.type !== "request" && (
+                  {node.type !== "request" && node.type !== "websocket" && (
                     <>
                       <DropdownMenuItem
                         onClick={() => handleCreate("collection")}
                       >
-                        <FolderPlusIcon className="mr-2 h-4 w-4" />
+                        <FolderPlusIcon />
                         New Folder
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleCreate("request")}>
-                        <FilePlusIcon className="mr-2 h-4 w-4" />
+                        <FilePlusIcon />
                         New Request
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleCreate("websocket")}
+                      >
+                        <PlugIcon />
+                        New WebSocket
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
                   )}
                   <DropdownMenuItem onClick={handleRename}>
-                    <Edit2Icon className="mr-2 h-4 w-4" />
+                    <Edit2Icon />
                     Rename
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => deleteNode(nodeId)}
                     className="text-red-600 focus:text-red-600"
                   >
-                    <Trash2Icon className="mr-2 h-4 w-4" />
+                    <Trash2Icon />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -178,28 +223,32 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-48">
-          {node.type !== "request" && (
+          {node.type !== "request" && node.type !== "websocket" && (
             <>
               <ContextMenuItem onClick={() => handleCreate("collection")}>
-                <FolderPlusIcon className="mr-2 h-4 w-4" />
+                <FolderPlusIcon />
                 New Folder
               </ContextMenuItem>
               <ContextMenuItem onClick={() => handleCreate("request")}>
-                <FilePlusIcon className="mr-2 h-4 w-4" />
+                <FilePlusIcon />
                 New Request
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleCreate("websocket")}>
+                <PlugIcon />
+                New WebSocket
               </ContextMenuItem>
               <ContextMenuSeparator />
             </>
           )}
           <ContextMenuItem onClick={handleRename}>
-            <Edit2Icon className="mr-2 h-4 w-4" />
+            <Edit2Icon />
             Rename
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => deleteNode(nodeId)}
             className="text-red-600 focus:text-red-600"
           >
-            <Trash2Icon className="mr-2 h-4 w-4" />
+            <Trash2Icon />
             Delete
           </ContextMenuItem>
         </ContextMenuContent>
@@ -207,9 +256,14 @@ export function SidebarItem({ nodeId, level = 0 }: SidebarItemProps) {
 
       {isExpanded && node.children && (
         <div>
-          {node.children.map((childId) => (
-            <SidebarItem key={childId} nodeId={childId} level={level + 1} />
-          ))}
+          <SortableContext
+            items={node.children}
+            strategy={verticalListSortingStrategy}
+          >
+            {node.children.map((childId) => (
+              <SidebarItem key={childId} nodeId={childId} level={level + 1} />
+            ))}
+          </SortableContext>
         </div>
       )}
     </div>

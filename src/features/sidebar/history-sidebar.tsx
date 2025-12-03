@@ -55,12 +55,12 @@ export function HistorySidebar() {
         </span>
         <Button
           variant="ghost"
-          size="icon"
-          className="h-6 w-6"
+          size="icon-sm"
+          className=""
           onClick={clearHistory}
           title="Clear History"
         >
-          <Trash2Icon size={14} />
+          <Trash2Icon />
         </Button>
       </div>
       <ScrollArea className="flex-1">
@@ -119,7 +119,7 @@ export function HistorySidebar() {
               </ContextMenuTrigger>
               <ContextMenuContent>
                 <ContextMenuItem onClick={() => handleSaveAsFile(item)}>
-                  <SaveIcon className="w-4 h-4 mr-2" /> Save as Request
+                  <SaveIcon /> Save as Request
                 </ContextMenuItem>
               </ContextMenuContent>
             </ContextMenu>

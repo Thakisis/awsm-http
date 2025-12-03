@@ -18,13 +18,14 @@ import {
   RocketIcon,
   EyeIcon,
   EyeOffIcon,
+  GripVerticalIcon,
 } from "lucide-react";
 import { ScriptExecutor } from "@/services/script-executor";
 import { toast } from "sonner";
 
 import { RequestTabs } from "./request-tabs";
 import { ResponseViewer } from "./response-viewer";
-import { HttpMethod, RequestAuth } from "@/types";
+import { HttpMethod, RequestAuth, RequestBody } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,23 @@ import { VesperTheme } from "./themes/vesper";
 import { VesperLightTheme } from "./themes/vesper-light";
 import { useTheme } from "@/components/theme-provider";
 import { getFaker } from "@/services/faker-service";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const handleEditorDidMount = (monaco: Monaco) => {
   monaco.editor.defineTheme("Vesper", VesperTheme as any);
@@ -169,6 +187,7 @@ import { substituteVariables } from "@/lib/utils";
 import { VariableInput } from "@/components/variable-input";
 import { CodeGeneratorDialog } from "./code-generator-dialog";
 import { FakerGeneratorDialog } from "./faker-generator-dialog";
+import { WebSocketEditor } from "./websocket-editor";
 
 // --- Helper Components ---
 
@@ -177,6 +196,7 @@ function KeyValueTable({
   onUpdate,
   onAdd,
   onRemove,
+  onReorder,
   keyPlaceholder = "Key",
   valuePlaceholder = "Value",
 }: {
@@ -190,9 +210,33 @@ function KeyValueTable({
   onUpdate: (id: string, field: string, value: any) => void;
   onAdd: () => void;
   onRemove: (id: string) => void;
+  onReorder?: (newItems: any[]) => void;
   keyPlaceholder?: string;
   valuePlaceholder?: string;
 }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !onReorder) return;
+
+    const oldIndex = items.findIndex((item) => item.id === active.id);
+    const newIndex = items.findIndex((item) => item.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onReorder(arrayMove(items, oldIndex, newIndex));
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between mb-2">
@@ -209,40 +253,24 @@ function KeyValueTable({
         </Button>
       </div>
       <div className="space-y-1">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-start gap-2 group">
-            <Checkbox
-              checked={item.enabled}
-              onCheckedChange={(c) => onUpdate(item.id, "enabled", c)}
-              className="mt-2.5"
-            />
-            <div className="flex-1 grid grid-cols-2 gap-2">
-              <VariableInput
-                placeholder={keyPlaceholder}
-                value={item.key}
-                onChange={(e) => onUpdate(item.id, "key", e.target.value)}
-                className="h-8 text-sm font-mono"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={items} strategy={verticalListSortingStrategy}>
+            {items.map((item) => (
+              <SortableRow
+                key={item.id}
+                item={item}
+                onUpdate={onUpdate}
+                onRemove={onRemove}
+                keyPlaceholder={keyPlaceholder}
+                valuePlaceholder={valuePlaceholder}
               />
-              <VariableInput
-                placeholder={valuePlaceholder}
-                value={item.value}
-                onChange={(e) => onUpdate(item.id, "value", e.target.value)}
-                className="h-8 text-sm font-mono"
-              />
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => onRemove(item.id)}
-            >
-              <Trash2Icon
-                size={14}
-                className="text-muted-foreground hover:text-red-500"
-              />
-            </Button>
-          </div>
-        ))}
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
       {items.length === 0 && (
         <div className="text-center py-8 text-muted-foreground text-sm border border-dashed rounded-md bg-muted/5">
@@ -601,6 +629,87 @@ function AuthEditor({
   );
 }
 
+function SortableRow({
+  item,
+  onUpdate,
+  onRemove,
+  keyPlaceholder,
+  valuePlaceholder,
+}: {
+  item: {
+    id: string;
+    key: string;
+    value: string;
+    enabled: boolean;
+    description?: string;
+  };
+  onUpdate: (id: string, field: string, value: any) => void;
+  onRemove: (id: string) => void;
+  keyPlaceholder?: string;
+  valuePlaceholder?: string;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-start gap-2 group"
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="mt-2.5 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+      >
+        <GripVerticalIcon size={14} />
+      </div>
+      <Checkbox
+        checked={item.enabled}
+        onCheckedChange={(c) => onUpdate(item.id, "enabled", c)}
+        className="mt-2.5"
+      />
+      <div className="flex-1 grid grid-cols-2 gap-2">
+        <VariableInput
+          placeholder={keyPlaceholder}
+          value={item.key}
+          onChange={(e) => onUpdate(item.id, "key", e.target.value)}
+          className="h-8 text-sm font-mono"
+        />
+        <VariableInput
+          placeholder={valuePlaceholder}
+          value={item.value}
+          onChange={(e) => onUpdate(item.id, "value", e.target.value)}
+          className="h-8 text-sm font-mono"
+        />
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={() => onRemove(item.id)}
+      >
+        <Trash2Icon
+          size={14}
+          className="text-muted-foreground hover:text-red-500"
+        />
+      </Button>
+    </div>
+  );
+}
+
 export function RequestEditor() {
   const [is2XL, setIs2XL] = useState(false);
   const [isFakerDialogOpen, setIsFakerDialogOpen] = useState(false);
@@ -648,7 +757,10 @@ export function RequestEditor() {
     });
   }
 
-  if (!activeRequestId || !node || node.type !== "request" || !node.data) {
+  const isValidRequest = node?.type === "request" && !!node.data;
+  const isValidWebSocket = node?.type === "websocket" && !!node.wsData;
+
+  if (!activeRequestId || !node || (!isValidRequest && !isValidWebSocket)) {
     return (
       <div className="h-full flex flex-col">
         <RequestTabs />
@@ -669,15 +781,26 @@ export function RequestEditor() {
     );
   }
 
+  if (node.type === "websocket") {
+    return (
+      <div className="flex flex-col h-full">
+        <RequestTabs />
+        <WebSocketEditor requestId={activeRequestId} />
+      </div>
+    );
+  }
+
   // Destructure with defaults for backward compatibility
   const {
-    url,
-    method,
-    headers,
-    body,
+    url = "",
+    method = "GET",
+    headers = [],
+    body = { type: "none", content: "" } as RequestBody,
     auth = { type: "none" },
     params = [],
-  } = node.data;
+  } = node.data || {}; // Handle case where data might be missing if type mismatch
+
+  if (!node.data) return null; // Should not happen if type check passes, but safe guard
 
   const handleSend = async () => {
     if (!node.data) return;
@@ -1095,6 +1218,9 @@ export function RequestEditor() {
                   onUpdate={updateParams}
                   onAdd={addParam}
                   onRemove={removeParam}
+                  onReorder={(newItems) =>
+                    updateRequestData(activeRequestId, { params: newItems })
+                  }
                 />
               </TabsContent>
 
@@ -1119,6 +1245,9 @@ export function RequestEditor() {
                   onUpdate={updateHeader}
                   onAdd={addHeader}
                   onRemove={removeHeader}
+                  onReorder={(newItems) =>
+                    updateRequestData(activeRequestId, { headers: newItems })
+                  }
                 />
               </TabsContent>
 
@@ -1256,6 +1385,11 @@ export function RequestEditor() {
                         onUpdate={updateFormData}
                         onAdd={addFormData}
                         onRemove={removeFormData}
+                        onReorder={(newItems) =>
+                          updateRequestData(activeRequestId, {
+                            body: { ...body, formData: newItems },
+                          })
+                        }
                       />
                     </div>
                   )}
@@ -1266,6 +1400,11 @@ export function RequestEditor() {
                         onUpdate={updateFormUrlEncoded}
                         onAdd={addFormUrlEncoded}
                         onRemove={removeFormUrlEncoded}
+                        onReorder={(newItems) =>
+                          updateRequestData(activeRequestId, {
+                            body: { ...body, formUrlEncoded: newItems },
+                          })
+                        }
                       />
                     </div>
                   )}

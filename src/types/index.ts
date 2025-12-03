@@ -1,5 +1,18 @@
-export type NodeType = "workspace" | "collection" | "request";
+export type NodeType = "workspace" | "collection" | "request" | "websocket";
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+export interface WebSocketMessage {
+  id: string;
+  type: "sent" | "received" | "system" | "error";
+  data: string;
+  timestamp: number;
+}
+
+export interface WebSocketRequestData {
+  url: string;
+  type?: "raw" | "socket.io";
+  messages?: WebSocketMessage[];
+}
 
 export interface RequestHeader {
   id: string;
@@ -96,6 +109,7 @@ export interface TreeNode {
   children?: string[]; // Array of child IDs
   isExpanded?: boolean;
   data?: RequestData; // Only for type === 'request'
+  wsData?: WebSocketRequestData; // Only for type === 'websocket'
   isTemporary?: boolean; // If true, deleted when tab is closed
 }
 
