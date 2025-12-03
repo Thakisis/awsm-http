@@ -32,19 +32,19 @@ export function ResponseViewer({ response }: ResponseViewerProps) {
           <TabsList className="h-full bg-transparent p-0">
             <TabsTrigger
               value="body"
-              className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+              className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
             >
               Body
             </TabsTrigger>
             <TabsTrigger
               value="headers"
-              className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+              className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
             >
               Headers
             </TabsTrigger>
             <TabsTrigger
               value="raw"
-              className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+              className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
             >
               Raw
             </TabsTrigger>

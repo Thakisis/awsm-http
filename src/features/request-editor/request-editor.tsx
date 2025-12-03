@@ -99,6 +99,12 @@ const handleEditorDidMount = (monaco: Monaco) => {
         body: any;
         rawBody: string;
       };
+      /**
+       * Define a test case.
+       * @param name The name of the test
+       * @param callback The function to execute. Receives a log function to set a description.
+       */
+      test(name: string, callback: (log: (message: string) => void) => void): void;
       /** Faker instance for generating random data */
       faker: {
 ${fakerTypeProps}
@@ -592,6 +598,7 @@ export function RequestEditor() {
       setResponse(activeRequestId, res);
 
       // 2. Execute Test Script
+      let testResults: any[] = [];
       if (node.data.testScript) {
         const result = ScriptExecutor.execute(node.data.testScript, {
           variables: currentVariables,
@@ -608,7 +615,13 @@ export function RequestEditor() {
           console.log("Test Script Logs:", result.logs);
           toast.info(`Test Logs: ${result.logs.join("\n")}`);
         }
+
+        testResults = result.testResults;
       }
+
+      // Update response with test results
+      const responseWithTests = { ...res, testResults };
+      setResponse(activeRequestId, responseWithTests);
 
       addToHistory({
         requestId: activeRequestId,
@@ -619,7 +632,7 @@ export function RequestEditor() {
         statusText: res.statusText,
         duration: res.time,
         size: res.size,
-        response: res,
+        response: responseWithTests,
       });
     } catch (error) {
       toast.error("Failed to send request");
@@ -829,7 +842,7 @@ export function RequestEditor() {
           direction={is2XL ? "horizontal" : "vertical"}
           className="h-full w-full"
         >
-          <ResizablePanel defaultSize={50} minSize={30}>
+          <ResizablePanel defaultSize={50} minSize={35}>
             <Tabs defaultValue="params" className="h-full flex flex-col">
               <div className="flex items-center px-4 border-b bg-muted/5 min-h-10">
                 <TabsList className="h-full bg-transparent p-0 w-full justify-start overflow-x-auto ">

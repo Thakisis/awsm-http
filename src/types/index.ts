@@ -59,6 +59,13 @@ export interface RequestData {
   testScript?: string;
 }
 
+export interface TestResult {
+  name: string;
+  status: "passed" | "failed";
+  error?: string;
+  description?: string;
+}
+
 export interface ResponseData {
   status: number;
   statusText: string;
@@ -67,6 +74,7 @@ export interface ResponseData {
   headers: Record<string, string>;
   body: unknown;
   rawBody: string;
+  testResults?: TestResult[];
 }
 
 export interface TreeNode {

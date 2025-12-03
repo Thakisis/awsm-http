@@ -1,4 +1,4 @@
-import { RequestData, ResponseData } from "@/types";
+import { RequestData, ResponseData, TestResult } from "@/types";
 import { getFaker } from "@/services/faker-service";
 
 interface ScriptContext {
@@ -12,15 +12,17 @@ interface ScriptResult {
   variables: Record<string, string>;
   logs: string[];
   error?: string;
+  testResults: TestResult[];
 }
 
 export class ScriptExecutor {
   static execute(script: string, context: ScriptContext): ScriptResult {
     if (!script || script.trim() === "") {
-      return { variables: context.variables, logs: [] };
+      return { variables: context.variables, logs: [], testResults: [] };
     }
 
     const logs: string[] = [];
+    const testResults: TestResult[] = [];
     const variables = { ...context.variables };
     const faker = getFaker(context.fakerLocale || "en");
 
@@ -33,6 +35,25 @@ export class ScriptExecutor {
       },
       log: (...args: any[]) => {
         logs.push(args.map((a) => String(a)).join(" "));
+      },
+      test: (name: string, callback: (log: (msg: string) => void) => void) => {
+        let description: string | undefined;
+        const logFn = (msg: string) => {
+          description = msg;
+          logs.push(msg);
+        };
+
+        try {
+          callback(logFn);
+          testResults.push({ name, status: "passed", description });
+        } catch (e: any) {
+          testResults.push({
+            name,
+            status: "failed",
+            error: e.message,
+            description,
+          });
+        }
       },
       faker: faker,
       request: context.request,
@@ -48,10 +69,11 @@ export class ScriptExecutor {
       return {
         variables,
         logs,
+        testResults,
         error: err.message || "Unknown script error",
       };
     }
 
-    return { variables, logs };
+    return { variables, logs, testResults };
   }
 }

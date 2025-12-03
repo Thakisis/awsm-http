@@ -18,7 +18,8 @@ import {
 import { EnvironmentSelector } from "../environments/environment-selector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HistorySidebar } from "./history-sidebar";
-import { HistoryIcon, FolderIcon } from "lucide-react";
+import { TestResultsSidebar } from "./test-results-sidebar";
+import { HistoryIcon, FolderIcon, BeakerIcon } from "lucide-react";
 
 export function Sidebar() {
   const rootIds = useWorkspaceStore((state) => state.rootIds);
@@ -44,12 +45,15 @@ export function Sidebar() {
 
       <Tabs defaultValue="explorer" className="flex-1 flex flex-col min-h-0">
         <div className="px-2 pt-2">
-          <TabsList className="w-full grid grid-cols-2">
-            <TabsTrigger value="explorer" className="text-xs">
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="explorer" className="text-xs px-0">
               <FolderIcon className="w-3 h-3 mr-2" /> Explorer
             </TabsTrigger>
-            <TabsTrigger value="history" className="text-xs">
+            <TabsTrigger value="history" className="text-xs px-0">
               <HistoryIcon className="w-3 h-3 mr-2" /> History
+            </TabsTrigger>
+            <TabsTrigger value="tests" className="text-xs px-0">
+              <BeakerIcon className="w-3 h-3 mr-2" /> Tests
             </TabsTrigger>
           </TabsList>
         </div>
@@ -91,6 +95,10 @@ export function Sidebar() {
 
         <TabsContent value="history" className="flex-1 min-h-0 m-0">
           <HistorySidebar />
+        </TabsContent>
+
+        <TabsContent value="tests" className="flex-1 min-h-0 m-0">
+          <TestResultsSidebar />
         </TabsContent>
       </Tabs>
     </div>

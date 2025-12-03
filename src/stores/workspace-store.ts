@@ -84,11 +84,12 @@ const DEFAULT_REQUEST_DATA: RequestData = {
 // awsm.variables.set("timestamp", Date.now());
 // awsm.log("Timestamp set!");`,
   testScript: `// Example: Check status code
-// if (awsm.response.status === 200) {
-//   awsm.log("Success!");
-// } else {
-//   awsm.log("Failed with status: " + awsm.response.status);
-// }`,
+// awsm.test("Status code is 200", (log) => {
+//   if (awsm.response.status !== 200) {
+//     throw new Error("Expected 200 OK");
+//   }
+//   log("Server responded with " + awsm.response.status);
+// });`,
 };
 
 export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
@@ -472,11 +473,13 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
               '{\n  "username": "admin",\n  "password": "password123"\n}',
           },
           testScript: `// Example: Extract token and set to environment variable
-// const data = awsm.response.body;
-// if (data.token) {
-//   awsm.variables.set("token", data.token);
-//   awsm.log("Token updated!");
-// }`,
+// awsm.test("Extract token", () => {
+//   const data = awsm.response.body;
+//   if (data.token) {
+//     awsm.variables.set("token", data.token);
+//     awsm.log("Token updated!");
+//   }
+// });`,
         });
 
         const usersFolderId = addNode(wsId, "collection", "Users");
@@ -486,9 +489,19 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           method: "GET",
           body: { type: "none", content: "" },
           preRequestScript: `awsm.log("Fetching users list...");`,
-          testScript: `if (awsm.response.status === 200) {
-  awsm.log("Users fetched successfully. Count: " + (Array.isArray(awsm.response.body) ? awsm.response.body.length : 0));
-}`,
+          testScript: `awsm.test("Status code is 200", (log) => {
+  if (awsm.response.status !== 200) {
+    throw new Error("Expected 200 OK");
+  }
+  log("Status: " + awsm.response.status);
+});
+
+awsm.test("Response is array", (log) => {
+  if (!Array.isArray(awsm.response.body)) {
+    throw new Error("Expected response body to be an array");
+  }
+  log("Users count: " + awsm.response.body.length);
+});`,
         });
 
         const createUserReqId = addNode(
