@@ -683,6 +683,8 @@ export function RequestEditor() {
     if (!node.data) return;
     setIsLoading(true);
 
+    let allLogs: string[] = [];
+
     // 1. Execute Pre-request Script
     let currentVariables = { ...variables };
     if (node.data.preRequestScript) {
@@ -691,6 +693,10 @@ export function RequestEditor() {
         request: node.data,
         fakerLocale,
       });
+
+      if (result.logs) {
+        allLogs.push(...result.logs);
+      }
 
       if (result.error) {
         toast.error(`Pre-request script error: ${result.error}`);
@@ -789,7 +795,6 @@ export function RequestEditor() {
 
     try {
       const res = await HttpClient.send(requestData);
-      setResponse(activeRequestId, res);
 
       // 2. Execute Test Script
       let testResults: any[] = [];
@@ -801,21 +806,18 @@ export function RequestEditor() {
           fakerLocale,
         });
 
-        if (result.error) {
-          toast.error(`Test script error: ${result.error}`);
-        }
-
-        if (result.logs.length > 0) {
-          console.log("Test Script Logs:", result.logs);
-          toast.info(`Test Logs: ${result.logs.join("\n")}`);
+        if (result.logs) {
+          allLogs.push(...result.logs);
         }
 
         testResults = result.testResults;
+        if (result.error) {
+          toast.error(`Test script error: ${result.error}`);
+        }
       }
 
-      // Update response with test results
-      const responseWithTests = { ...res, testResults };
-      setResponse(activeRequestId, responseWithTests);
+      setResponse(activeRequestId, { ...res, testResults, logs: allLogs });
+      toast.success("Request completed successfully");
 
       addToHistory({
         requestId: activeRequestId,
@@ -826,7 +828,7 @@ export function RequestEditor() {
         statusText: res.statusText,
         duration: res.time,
         size: res.size,
-        response: responseWithTests,
+        response: { ...res, testResults, logs: allLogs },
       });
     } catch (error) {
       toast.error("Failed to send request");
@@ -1318,7 +1320,7 @@ export function RequestEditor() {
             </Tabs>
           </ResizablePanel>
 
-          <ResizableHandle withHandle />
+          <ResizableHandle withHandle className="bg-primary/30" />
 
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="h-full flex flex-col bg-muted/5">

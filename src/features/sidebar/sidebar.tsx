@@ -9,6 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { EnvironmentSelector } from "../environments/environment-selector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HistorySidebar } from "./history-sidebar";
@@ -32,8 +38,8 @@ export function Sidebar() {
   };
 
   return (
-    <div className="h-full border-r bg-muted/10 flex flex-col">
-      <div className="p-2 border-b">
+    <div className="h-full border-r flex flex-col">
+      <div className="p-[5.5px] border-b bg-muted/40">
         <EnvironmentSelector />
       </div>
 
@@ -54,7 +60,7 @@ export function Sidebar() {
 
         <TabsContent
           value="explorer"
-          className="flex-1 flex flex-col min-h-0 m-0 mt-2"
+          className="flex-1 flex flex-col min-h-0 m-0 "
         >
           <div className="px-2 pb-2 flex items-center justify-between group">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -62,7 +68,7 @@ export function Sidebar() {
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-5 w-5">
+                <Button variant="ghost" size="icon-sm">
                   <PlusIcon size={14} />
                 </Button>
               </DropdownMenuTrigger>
@@ -78,13 +84,25 @@ export function Sidebar() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <ScrollArea className="flex-1">
-            <div className="p-2">
-              {rootIds.map((id) => (
-                <SidebarItem key={id} nodeId={id} level={0} />
-              ))}
-            </div>
-          </ScrollArea>
+          <ContextMenu>
+            <ContextMenuTrigger className="flex-1 flex flex-col min-h-0">
+              <ScrollArea className="flex-1">
+                <div className="p-2 min-h-full">
+                  {rootIds.map((id) => (
+                    <SidebarItem key={id} nodeId={id} level={0} />
+                  ))}
+                </div>
+              </ScrollArea>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem onClick={() => handleCreateRoot("collection")}>
+                <FolderPlusIcon className="mr-2 h-4 w-4" /> New Collection
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => handleCreateRoot("request")}>
+                <FilePlusIcon className="mr-2 h-4 w-4" /> New Request
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         </TabsContent>
 
         <TabsContent value="history" className="flex-1 min-h-0 m-0">

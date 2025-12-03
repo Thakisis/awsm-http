@@ -40,7 +40,6 @@ export class ScriptExecutor {
         let description: string | undefined;
         const logFn = (msg: string) => {
           description = msg;
-          logs.push(msg);
         };
 
         try {

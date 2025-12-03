@@ -85,6 +85,7 @@ export interface ResponseData {
   body: unknown;
   rawBody: string;
   testResults?: TestResult[];
+  logs?: string[];
 }
 
 export interface TreeNode {

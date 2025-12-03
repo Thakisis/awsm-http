@@ -2,7 +2,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HttpMethod } from "@/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const METHOD_COLORS: Record<HttpMethod, string> = {
   GET: "text-green-500",
@@ -22,7 +22,7 @@ export function RequestTabs() {
   if (openRequestIds.length === 0) return null;
 
   return (
-    <ScrollArea className="w-full border-b bg-muted/40 h-11">
+    <ScrollArea className="w-full border-b bg-muted/40 h-12 ">
       <div className="flex w-max min-w-full h-full">
         {openRequestIds.map((id) => {
           const node = nodes[id];
@@ -74,6 +74,7 @@ export function RequestTabs() {
           );
         })}
       </div>
+      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
 }

@@ -49,7 +49,7 @@ export function ResponseViewer({ response }: ResponseViewerProps) {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-4 text-xs select-text">
             {isJson && <TypeGeneratorDialog json={response.body} />}
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">Status:</span>
@@ -122,9 +122,11 @@ export function ResponseViewer({ response }: ResponseViewerProps) {
         >
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm font-mono">
             {Object.entries(response.headers).map(([key, value]) => (
-              <div key={key} className="contents">
-                <span className="text-muted-foreground text-right">{key}:</span>
-                <span className="break-all">{value}</span>
+              <div key={key} className="contents select-text">
+                <span className="text-muted-foreground text-right ">
+                  {key}:
+                </span>
+                <span className="break-all ">{value}</span>
               </div>
             ))}
           </div>
@@ -134,7 +136,7 @@ export function ResponseViewer({ response }: ResponseViewerProps) {
           value="raw"
           className="flex-1 min-h-0 m-0 p-4 overflow-auto"
         >
-          <pre className="text-xs font-mono whitespace-pre-wrap break-all">
+          <pre className="text-xs font-mono whitespace-pre-wrap break-all select-all">
             {response.rawBody}
           </pre>
         </TabsContent>

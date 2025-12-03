@@ -46,7 +46,11 @@ export function TypeGeneratorDialog({ json }: TypeGeneratorDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-6 text-xs gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 text-xs gap- select-none"
+        >
           <FileJsonIcon className="h-3 w-3" /> TS Types
         </Button>
       </DialogTrigger>
