@@ -522,28 +522,28 @@ export function RequestEditor() {
           <ResizablePanel defaultSize={50} minSize={30}>
             <Tabs defaultValue="params" className="h-full flex flex-col">
               <div className="flex items-center px-4 border-b bg-muted/5 min-h-10">
-                <TabsList className="h-full bg-transparent p-0 w-full justify-start overflow-x-auto no-scrollbar">
+                <TabsList className="h-full bg-transparent p-0 w-full justify-start overflow-x-auto ">
                   <TabsTrigger
                     value="params"
-                    className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+                    className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
                   >
                     Params {params.length > 0 && `(${params.length})`}
                   </TabsTrigger>
                   <TabsTrigger
                     value="auth"
-                    className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+                    className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
                   >
                     Auth {auth.type !== "none" && "•"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="headers"
-                    className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+                    className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
                   >
                     Headers {headers.length > 0 && `(${headers.length})`}
                   </TabsTrigger>
                   <TabsTrigger
                     value="body"
-                    className="h-[39px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
+                    className="h-[39px] border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs px-4"
                   >
                     Body {body.type !== "none" && "•"}
                   </TabsTrigger>
