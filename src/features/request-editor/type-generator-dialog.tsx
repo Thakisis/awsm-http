@@ -9,8 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { FileJsonIcon, CopyIcon, CheckIcon } from "lucide-react";
 import { generateTypescriptInterfaces } from "@/lib/code-generators";
-import { Editor } from "@monaco-editor/react";
+import { Editor, type Monaco } from "@monaco-editor/react";
 import { useTheme } from "@/components/theme-provider";
+import { VesperTheme } from "./themes/vesper";
+import { VesperLightTheme } from "./themes/vesper-light";
+
+const handleEditorDidMount = (monaco: Monaco) => {
+  monaco.editor.defineTheme("Vesper", VesperTheme as any);
+  monaco.editor.defineTheme("VesperLight", VesperLightTheme as any);
+};
 
 interface TypeGeneratorDialogProps {
   json: any;
@@ -33,8 +40,8 @@ export function TypeGeneratorDialog({ json }: TypeGeneratorDialogProps) {
     theme === "dark" ||
     (theme === "system" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ? "vs-dark"
-      : "light";
+      ? "Vesper"
+      : "VesperLight";
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -67,6 +74,7 @@ export function TypeGeneratorDialog({ json }: TypeGeneratorDialogProps) {
             language="typescript"
             value={code}
             theme={editorTheme}
+            beforeMount={handleEditorDidMount}
             options={{
               readOnly: true,
               minimap: { enabled: false },

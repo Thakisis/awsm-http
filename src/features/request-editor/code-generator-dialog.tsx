@@ -18,6 +18,14 @@ import { Editor } from "@monaco-editor/react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/components/theme-provider";
 import { substituteVariables } from "@/lib/utils";
+import { VesperTheme } from "./themes/vesper";
+import { VesperLightTheme } from "./themes/vesper-light";
+import { type Monaco } from "@monaco-editor/react";
+
+const handleEditorDidMount = (monaco: Monaco) => {
+  monaco.editor.defineTheme("Vesper", VesperTheme as any);
+  monaco.editor.defineTheme("VesperLight", VesperLightTheme as any);
+};
 
 interface CodeGeneratorDialogProps {
   request: RequestData;
@@ -123,8 +131,8 @@ export function CodeGeneratorDialog({
     theme === "dark" ||
     (theme === "system" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ? "vs-dark"
-      : "light";
+      ? "Vesper"
+      : "VesperLight";
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -165,6 +173,7 @@ export function CodeGeneratorDialog({
               language={activeTab === "curl" ? "shell" : activeTab}
               value={getCode(activeTab)}
               theme={editorTheme}
+              beforeMount={handleEditorDidMount}
               options={{
                 readOnly: true,
                 minimap: { enabled: false },
