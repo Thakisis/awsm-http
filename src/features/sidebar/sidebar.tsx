@@ -41,13 +41,13 @@ export function Sidebar() {
         <div className="px-2 pt-2">
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="explorer" className="text-xs px-0">
-              <FolderIcon className="w-3 h-3 mr-2" /> Explorer
+              <FolderIcon className="size-3 " /> Explorer
             </TabsTrigger>
             <TabsTrigger value="history" className="text-xs px-0">
-              <HistoryIcon className="w-3 h-3 mr-2" /> History
+              <HistoryIcon className="size-3" /> History
             </TabsTrigger>
             <TabsTrigger value="tests" className="text-xs px-0">
-              <BeakerIcon className="w-3 h-3 mr-2" /> Tests
+              <BeakerIcon className="size-3 " /> Tests
             </TabsTrigger>
           </TabsList>
         </div>

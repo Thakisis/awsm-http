@@ -970,7 +970,12 @@ export function RequestEditor() {
       }
     }
   };
-
+  const editorTheme =
+    theme === "dark" ||
+    (theme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ? "Vesper"
+      : "VesperLight";
   return (
     <div className="h-full flex flex-col">
       <RequestTabs />
@@ -1037,7 +1042,7 @@ export function RequestEditor() {
           className="h-full w-full"
         >
           <ResizablePanel defaultSize={50} minSize={35}>
-            <Tabs defaultValue="params" className="h-full flex flex-col">
+            <Tabs defaultValue="tests" className="h-full flex flex-col">
               <div className="flex items-center px-4 border-b bg-muted/5 min-h-10">
                 <TabsList className="h-full bg-transparent p-0 w-full justify-start overflow-x-auto ">
                   <TabsTrigger
@@ -1183,7 +1188,7 @@ export function RequestEditor() {
                           body: { ...body, content: val! },
                         })
                       }
-                      theme={theme === "dark" ? "Vesper" : "VesperLight"}
+                      theme={editorTheme}
                       beforeMount={handleEditorDidMount}
                       onMount={handleEditorMount}
                       options={{
@@ -1218,7 +1223,7 @@ export function RequestEditor() {
                           body: { ...body, content: val || "" },
                         })
                       }
-                      theme={theme === "dark" ? "Vesper" : "VesperLight"}
+                      theme={editorTheme}
                       beforeMount={handleEditorDidMount}
                       onMount={handleEditorMount}
                       options={{
@@ -1281,7 +1286,7 @@ export function RequestEditor() {
                       preRequestScript: val || "",
                     })
                   }
-                  theme={theme === "dark" ? "Vesper" : "VesperLight"}
+                  theme={editorTheme}
                   beforeMount={handleEditorDidMount}
                   options={{
                     fontSize: 14,
@@ -1301,7 +1306,7 @@ export function RequestEditor() {
                       testScript: val || "",
                     })
                   }
-                  theme={theme === "dark" ? "Vesper" : "VesperLight"}
+                  theme={editorTheme}
                   beforeMount={handleEditorDidMount}
                   options={{
                     fontSize: 14,
