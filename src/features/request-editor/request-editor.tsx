@@ -341,6 +341,7 @@ export function RequestEditor() {
     (state) => state.updateRequestData
   );
   const setResponse = useWorkspaceStore((state) => state.setResponse);
+  const addToHistory = useWorkspaceStore((state) => state.addToHistory);
   const response = useWorkspaceStore((state) =>
     activeRequestId ? state.responses[activeRequestId] : null
   );
@@ -473,6 +474,17 @@ export function RequestEditor() {
 
     const res = await HttpClient.send(requestData);
     setResponse(activeRequestId, res);
+    addToHistory({
+      requestId: activeRequestId,
+      method: requestData.method,
+      url: requestData.url,
+      timestamp: Date.now(),
+      status: res.status,
+      statusText: res.statusText,
+      duration: res.time,
+      size: res.size,
+      response: res,
+    });
     setIsLoading(false);
   };
 

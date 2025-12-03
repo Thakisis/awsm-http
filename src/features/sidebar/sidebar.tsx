@@ -16,6 +16,9 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { EnvironmentSelector } from "../environments/environment-selector";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HistorySidebar } from "./history-sidebar";
+import { HistoryIcon, FolderIcon } from "lucide-react";
 
 export function Sidebar() {
   const rootIds = useWorkspaceStore((state) => state.rootIds);
@@ -38,58 +41,58 @@ export function Sidebar() {
       <div className="p-2 border-b">
         <EnvironmentSelector />
       </div>
-      <div className="p-2 flex items-center justify-between group">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Explorer
-        </span>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-5 w-5">
-              <PlusIcon size={14} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleCreateRoot("workspace")}>
-              <BoxIcon className="mr-2 h-4 w-4" />
-              New Workspace
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleCreateRoot("collection")}>
-              <FolderPlusIcon className="mr-2 h-4 w-4" />
-              New Folder
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleCreateRoot("request")}>
-              <FilePlusIcon className="mr-2 h-4 w-4" />
-              New Request
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
 
-      <ContextMenu>
-        <ContextMenuTrigger className="flex-1 min-h-0">
-          <ScrollArea className="h-full">
-            <div className="pb-4 min-h-[calc(100vh-100px)]">
+      <Tabs defaultValue="explorer" className="flex-1 flex flex-col min-h-0">
+        <div className="px-2 pt-2">
+          <TabsList className="w-full grid grid-cols-2">
+            <TabsTrigger value="explorer" className="text-xs">
+              <FolderIcon className="w-3 h-3 mr-2" /> Explorer
+            </TabsTrigger>
+            <TabsTrigger value="history" className="text-xs">
+              <HistoryIcon className="w-3 h-3 mr-2" /> History
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent
+          value="explorer"
+          className="flex-1 flex flex-col min-h-0 m-0 mt-2"
+        >
+          <div className="px-2 pb-2 flex items-center justify-between group">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Collections
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-5 w-5">
+                  <PlusIcon size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => handleCreateRoot("collection")}
+                >
+                  <FolderPlusIcon className="mr-2 h-4 w-4" /> New Collection
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCreateRoot("request")}>
+                  <FilePlusIcon className="mr-2 h-4 w-4" /> New Request
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-2">
               {rootIds.map((id) => (
-                <SidebarItem key={id} nodeId={id} />
+                <SidebarItem key={id} nodeId={id} level={0} />
               ))}
             </div>
           </ScrollArea>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onClick={() => handleCreateRoot("workspace")}>
-            <BoxIcon className="mr-2 h-4 w-4" />
-            New Workspace
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => handleCreateRoot("collection")}>
-            <FolderPlusIcon className="mr-2 h-4 w-4" />
-            New Folder
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => handleCreateRoot("request")}>
-            <FilePlusIcon className="mr-2 h-4 w-4" />
-            New Request
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+        </TabsContent>
+
+        <TabsContent value="history" className="flex-1 min-h-0 m-0">
+          <HistorySidebar />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

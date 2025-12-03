@@ -75,6 +75,7 @@ export interface TreeNode {
   children?: string[]; // Array of child IDs
   isExpanded?: boolean;
   data?: RequestData; // Only for type === 'request'
+  isTemporary?: boolean; // If true, deleted when tab is closed
 }
 
 export interface EnvironmentVariable {
@@ -90,6 +91,19 @@ export interface Environment {
   variables: EnvironmentVariable[];
 }
 
+export interface HistoryItem {
+  id: string;
+  requestId?: string; // If linked to a saved request
+  method: string;
+  url: string;
+  timestamp: number;
+  status: number;
+  statusText: string;
+  duration: number;
+  size: number;
+  response?: ResponseData;
+}
+
 export interface WorkspaceState {
   nodes: Record<string, TreeNode>;
   rootIds: string[];
@@ -98,4 +112,5 @@ export interface WorkspaceState {
   responses: Record<string, ResponseData | null>;
   environments: Environment[];
   activeEnvironmentId: string | null;
+  history: HistoryItem[];
 }

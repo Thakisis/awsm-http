@@ -3,13 +3,24 @@ import { persist } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
 import {
   TreeNode,
+  ResponseData,
+  Environment,
+  HistoryItem,
   NodeType,
   RequestData,
-  ResponseData,
-  WorkspaceState,
-  Environment,
   EnvironmentVariable,
-} from "../types";
+} from "@/types";
+
+export interface WorkspaceState {
+  nodes: Record<string, TreeNode>;
+  rootIds: string[];
+  activeRequestId: string | null;
+  openRequestIds: string[];
+  responses: Record<string, ResponseData | null>;
+  environments: Environment[];
+  activeEnvironmentId: string | null;
+  history: HistoryItem[];
+}
 
 interface WorkspaceActions {
   addNode: (parentId: string | null, type: NodeType, name: string) => string;
@@ -32,6 +43,11 @@ interface WorkspaceActions {
   ) => void;
   deleteEnvironment: (id: string) => void;
   setActiveEnvironment: (id: string | null) => void;
+
+  // History actions
+  addToHistory: (item: Omit<HistoryItem, "id">) => void;
+  clearHistory: () => void;
+  openHistoryItem: (item: HistoryItem) => void;
 
   initializeMockData: () => void;
   importWorkspace: (data: {
@@ -72,6 +88,17 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
       responses: {},
       environments: [],
       activeEnvironmentId: null,
+      history: [],
+
+      addToHistory: (item) => {
+        set((state) => ({
+          history: [{ ...item, id: uuidv4() }, ...state.history].slice(0, 50), // Keep last 50 items
+        }));
+      },
+
+      clearHistory: () => {
+        set({ history: [] });
+      },
 
       addNode: (parentId, type, name) => {
         const id = uuidv4();
@@ -267,6 +294,21 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             activeRequestId: newActiveRequestId,
           };
         });
+
+        // Cleanup temporary nodes
+        const state = get();
+        const node = state.nodes[id];
+        if (node && node.isTemporary) {
+          set((state) => {
+            const { [id]: deleted, ...remainingNodes } = state.nodes;
+            const { [id]: deletedResponse, ...remainingResponses } =
+              state.responses;
+            return {
+              nodes: remainingNodes,
+              responses: remainingResponses,
+            };
+          });
+        }
       },
 
       closeOtherTabs: (id) => {
@@ -337,6 +379,29 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
           environments: data.environments || [],
           activeEnvironmentId: data.environments?.[0]?.id || null,
         });
+      },
+
+      openHistoryItem: (item) => {
+        const id = uuidv4();
+        const newNode: TreeNode = {
+          id,
+          parentId: null,
+          name: `${item.method} ${item.url}`,
+          type: "request",
+          isTemporary: true,
+          data: {
+            ...DEFAULT_REQUEST_DATA,
+            method: item.method as any,
+            url: item.url,
+          },
+        };
+
+        set((state) => ({
+          nodes: { ...state.nodes, [id]: newNode },
+          openRequestIds: [...state.openRequestIds, id],
+          activeRequestId: id,
+          responses: { ...state.responses, [id]: item.response || null },
+        }));
       },
 
       initializeMockData: () => {
