@@ -5,7 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.0] - 2025-12-04
+
+### Added
+
+- **Mock Server**: A complete visual database schema designer and mock server.
+  - **Visual Graph Editor**: Design tables and relationships (Foreign Keys) using a node-based interface.
+  - **Data Generation**: Integrated Faker.js to generate realistic mock data for columns.
+  - **REST API**: Auto-generated endpoints for all tables with support for pagination (`page`, `pageSize`) and filtering.
+  - **Data Editor**: Built-in spreadsheet-like editor to manage mock data directly.
+  - **Smart Sync**: Non-destructive schema updates (preserves data when modifying tables).
+- **QS Builder**: New visual query string builder in the Request Editor.
+  - Supports complex nested objects and arrays using `qs` syntax.
+  - Real-time synchronization with the URL.
+- **Settings**:
+  - New **Server** tab to configure the Mock Server port (default: 3000) and API default page size.
+- **Documentation**:
+  - Added comprehensive documentation for the Mock Server.
+  - Updated "Getting Started" guide with a feature overview.
+
+### Changed
+
+- **Pagination**: The Mock Server API now returns a standardized response format:
+  ```json
+  {
+    "data": [...],
+    "meta": {
+      "pagination": { "page": 1, "pageSize": 10, "total": 50, "pageCount": 5 }
+    }
+  }
+  ```
+- **Faker Picker**: Improved UI to show clean variable names (e.g., `person.fullName`) instead of raw template syntax.
+- **Server Status**: The server running state is now persisted, so the "Stop Server" button remains visible after reopening the dialog.
+
+### Fixed
+
+- **Documentation**: Fixed layout issues where the ScrollArea would break when switching tabs.
+- **Schema Sync**: Fixed issues with Foreign Key persistence in SQLite by implementing a robust table recreation strategy.
 
 ## [0.5.0-beta] - 2025-12-03
 
