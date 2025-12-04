@@ -21,7 +21,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTrigger,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { useServerStore } from "./store/server-store";
 import { useWorkspaceStore } from "@/features/workspace/stores/workspace-store";
@@ -30,8 +29,6 @@ import { TableNode } from "./components/table-node";
 import Database from "@tauri-apps/plugin-sql";
 import { toast } from "sonner";
 import { invoke } from "@tauri-apps/api/core";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { loadSchemaFromDb, syncSchema } from "./lib/schema-sync";
 import { useTheme } from "../theme/theme-provider";
 
